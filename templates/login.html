@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vagaz</title>
+
+    <link rel="icon" type="image/png" href="/static/Remoto.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class', /* Ativa o Dark Mode via classe */
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#0d9488',
+                        brandHover: '#0f766e',
+                        softBg: '#f0fdfa',
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Fundo claro */
+        body.light-theme {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.15) 0px, transparent 50%);
+        }
+
+        /* Fundo escuro */
+        body.dark {
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.05) 0px, transparent 50%);
+        }
+
+        .form-slider {
+            display: flex;
+            width: 200%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-panel {
+            width: 50%;
+            padding: 0 0.5rem;
+        }
+
+        /* Toast Alert Customizado */
+        #toast {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+
+<body
+    class="light-theme min-h-screen flex flex-col items-center justify-center p-4 relative text-gray-800 dark:text-gray-200">
+
+    <!-- Botão de Tema (Claro/Escuro) -->
+    <button onclick="toggleTheme()"
+        class="absolute top-6 right-6 p-3 rounded-full bg-white dark:bg-darkCard shadow-md text-gray-500 dark:text-yellow-300 hover:scale-110 transition-transform">
+        <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
+    </button>
+
+    <!-- Notificações Toast -->
+    <div id="toast"
+        class="absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium opacity-0 pointer-events-none transform -translate-y-4 z-50">
+        <span id="toast-message">Mensagem aqui</span>
+    </div>
+
+    <!-- Card Central -->
+    <div
+        class="max-w-sm w-full bg-white dark:bg-darkCard rounded-[2rem] shadow-xl overflow-hidden p-8 relative transition-colors duration-300">
+
+        <!-- Logo / Nome -->
+        <div class="text-center mb-8">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-softBg dark:bg-slate-800 mb-4 shadow-sm">
+                <!-- SUA IMAGEM AQUI -->
+                <img src="/static/Remoto.png" alt="Vagaz Logo" class="w-10 h-10 object-contain">
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">Vagaz</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">O seu radar de oportunidades.</p>
+        </div>
+
+        <!-- Seletor Pílula -->
+        <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex mb-8 relative">
+            <div id="slider-bg"
+                class="absolute w-1/2 h-[85%] bg-white dark:bg-slate-700 shadow-sm rounded-lg top-1/2 -translate-y-1/2 left-1 transition-all duration-300 ease-in-out">
+            </div>
+
+            <button onclick="switchTab('login')" id="btn-login"
+                class="flex-1 py-2 text-sm font-semibold z-10 text-brand dark:text-teal-400 transition-colors">Entrar</button>
+            <button onclick="switchTab('register')" id="btn-register"
+                class="flex-1 py-2 text-sm font-semibold z-10 text-gray-500 dark:text-gray-400 transition-colors">Cadastrar</button>
+        </div>
+
+        <!-- Formulários -->
+        <div class="overflow-hidden">
+            <div id="form-slider" class="form-slider translate-x-0">
+
+                <!-- 1. Formulário de Login -->
+                <div class="form-panel">
+                    <form id="form-login" class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">E-mail</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-regular fa-envelope text-gray-400 text-sm"></i>
+                                </div>
+                                <input type="email" id="login-email"
+                                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all outline-none text-sm text-gray-700 dark:text-gray-200"
+                                    placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">Senha</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock text-gray-400 text-sm"></i>
+                                </div>
+                                <input type="password" id="login-senha"
+                                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all outline-none text-sm text-gray-700 dark:text-gray-200"
+                                    placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between px-1 pt-1">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="login-lembrar"
+                                    class="rounded border-gray-300 text-brand focus:ring-brand dark:bg-slate-900">
+                                <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">Lembrar de mim</span>
+                            </label>
+                            <a href="javascript:void(0)" onclick="esqueciSenha()"
+                                class="text-xs font-medium text-brand dark:text-teal-400 hover:text-brandHover transition-colors">Esqueci
+                                a senha</a>
+                        </div>
+
+                        <button type="submit" id="btn-submit-login"
+                            class="w-full bg-brand hover:bg-brandHover text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-brand/30 active:scale-[0.98] mt-2 flex justify-center items-center">
+                            Acessar Vagaz
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. Formulário de Cadastro -->
+                <div class="form-panel">
+                    <form id="form-register" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">Como
+                                quer ser chamado?</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-regular fa-user text-gray-400 text-sm"></i>
+                                </div>
+                                <input type="text" id="reg-nome"
+                                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all outline-none text-sm text-gray-700 dark:text-gray-200"
+                                    placeholder="Seu nome" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">E-mail</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-regular fa-envelope text-gray-400 text-sm"></i>
+                                </div>
+                                <input type="email" id="reg-email"
+                                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all outline-none text-sm text-gray-700 dark:text-gray-200"
+                                    placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 ml-1">Crie uma
+                                senha</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <i class="fa-solid fa-lock text-gray-400 text-sm"></i>
+                                </div>
+                                <input type="password" id="reg-senha" minlength="6"
+                                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand/20 focus:border-brand transition-all outline-none text-sm text-gray-700 dark:text-gray-200"
+                                    placeholder="Mínimo 6 caracteres" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btn-submit-reg"
+                            class="w-full bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white font-medium py-3 rounded-xl transition-all shadow-lg active:scale-[0.98] mt-2 flex justify-center items-center">
+                            Criar conta
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Logicos -->
+    <script>
+        // --- 1. LÓGICA DO TEMA (DARK/LIGHT MODE) ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                body.classList.remove('dark');
+                body.classList.add('light-theme');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                body.classList.add('dark');
+                body.classList.remove('light-theme');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Verifica a preferência salva quando a tela carrega
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            toggleTheme(); // Força o modo noturno se já estiver salvo
+        }
+
+        // --- 2. LÓGICA DO SLIDER (LOGIN / CADASTRO) ---
+        function switchTab(tab) {
+            const slider = document.getElementById('form-slider');
+            const sliderBg = document.getElementById('slider-bg');
+            const btnLogin = document.getElementById('btn-login');
+            const btnRegister = document.getElementById('btn-register');
+
+            if (tab === 'register') {
+                slider.style.transform = 'translateX(-50%)';
+                sliderBg.style.left = 'calc(50% - 4px)';
+
+                btnRegister.classList.remove('text-gray-500', 'dark:text-gray-400');
+                btnRegister.classList.add('text-brand', 'dark:text-teal-400');
+
+                btnLogin.classList.remove('text-brand', 'dark:text-teal-400');
+                btnLogin.classList.add('text-gray-500', 'dark:text-gray-400');
+            } else {
+                slider.style.transform = 'translateX(0)';
+                sliderBg.style.left = '4px';
+
+                btnLogin.classList.remove('text-gray-500', 'dark:text-gray-400');
+                btnLogin.classList.add('text-brand', 'dark:text-teal-400');
+
+                btnRegister.classList.remove('text-brand', 'dark:text-teal-400');
+                btnRegister.classList.add('text-gray-500', 'dark:text-gray-400');
+            }
+        }
+
+        // --- 3. LÓGICA DE ALERTAS (TOAST) ---
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+
+            if (isError) {
+                toast.classList.replace('bg-brand', 'bg-red-500') || toast.classList.add('bg-red-500');
+            } else {
+                toast.classList.replace('bg-red-500', 'bg-brand') || toast.classList.add('bg-brand');
+            }
+
+            toast.classList.remove('opacity-0', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 4000);
+        }
+
+        function esqueciSenha() {
+            showToast("Um link de recuperação seria enviado para seu e-mail!", false);
+        }
+
+        // --- 4. CONEXÃO COM O BACKEND (API) ---
+
+        // A. Processo de Cadastro
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-reg');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            const nome = document.getElementById('reg-nome').value;
+            const email = document.getElementById('reg-email').value;
+            const senha = document.getElementById('reg-senha').value;
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast("Conta criada com sucesso! Faça login.", false);
+                    switchTab('login'); // Volta pro login automaticamente
+                    document.getElementById('login-email').value = email; // Já preenche o email
+                } else {
+                    showToast(data.detail, true);
+                }
+            } catch (err) {
+                showToast("Erro no servidor.", true);
+            }
+            btn.innerHTML = 'Criar conta';
+        });
+
+        // B. Processo de Login
+        document.getElementById('form-login').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Impede a página de recarregar
+
+            // MODO À PROVA DE BALAS: Caça os campos dentro do formulário pelo 'name' ou 'type' em vez do ID!
+            const inputEmail = this.querySelector('input[type="email"], input[name="email"]');
+            const inputSenha = this.querySelector('input[type="password"], input[name="senha"], input[name="password"]');
+            const inputLembrar = this.querySelector('input[type="checkbox"]');
+
+            if (!inputEmail || !inputSenha) {
+                alert("Erro no formulário: Não consegui achar as caixas de e-mail e senha.");
+                return;
+            }
+
+            const dadosLogin = {
+                email: inputEmail.value,
+                senha: inputSenha.value,
+                lembrar: inputLembrar ? inputLembrar.checked : false
+            };
+
+            console.log("🚀 [FRONTEND] Disparando para o Python:", dadosLogin);
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosLogin)
+                });
+
+                console.log("📥 [FRONTEND] Resposta recebida com status:", response.status);
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Se o login der certo, joga pro lugar certo!
+                    if (data.is_admin === true) {
+                        console.log("👑 Modo Admin detectado! Redirecionando...");
+                        window.location.href = "/admin";
+                    } else {
+                        console.log("👤 Usuário comum detectado! Redirecionando...");
+                        window.location.href = "/dashboard";
+                    }
+                } else {
+                    alert(data.detail || "Erro ao fazer login");
+                }
+            } catch (error) {
+                console.error("❌ [FRONTEND] O Fetch falhou:", error);
+                alert("Erro de comunicação com o servidor. Veja o console.");
+            }
+        });
+
+    </script>
+</body>
+
+</html>

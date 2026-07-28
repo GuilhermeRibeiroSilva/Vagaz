@@ -1,0 +1,23 @@
+# Senhas e Variáveis de Ambiente
+.env
+
+# Pastas Virtuais do Python
+venv/
+env/
+.venv/
+
+# Arquivos temporários e Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Logs e Banco de Dados Local (se houver)
+logs/
+*.log
+*.sqlite3
+
+Comandos.txt
+ssh-key-2026-04-07.key
+ssh-key-2026-04-07.key.pub

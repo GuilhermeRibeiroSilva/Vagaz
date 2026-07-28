@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vagaz</title>
+    <link rel="icon" type="image/png" href="/static/Remoto.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: { colors: { brand: '#0d9488', brandHover: '#0f766e', darkBg: '#0f172a', darkCard: '#1e293b' } }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body:not(.dark) {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.15) 0px, transparent 50%);
+        }
+
+        body.dark {
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.05) 0px, transparent 50%);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toggle-checkbox:checked { right: 0; border-color: #0d9488; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #0d9488; }
+        #toast { transition: opacity 0.3s ease, transform 0.3s ease; }
+
+        select.custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+            padding-right: 2.5rem !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex transition-colors">
+
+    <!-- Notificações -->
+    <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium opacity-0 pointer-events-none transform -translate-y-4 z-50 transition-all bg-slate-900 dark:bg-brand">
+        <span id="toast-message">Mensagem</span>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-white dark:bg-darkCard shadow-lg flex flex-col h-full z-20 border-r border-slate-200 dark:border-slate-800">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700">
+            <img src="/static/Remoto.png" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
+            <span class="text-3xl font-black text-brand tracking-tighter">VAGAZ</span>
+        </div>
+        <nav class="p-6 space-y-2 flex-1">
+            <button onclick="changeTab('filtros')" id="nav-filtros" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand/10 text-brand font-medium transition-colors">
+                <i class="fa-solid fa-satellite-dish w-5"></i> Meus Radares
+            </button>
+            <button onclick="changeTab('resultados'); carregarResultados();" id="nav-resultados" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium">
+                <i class="fa-solid fa-briefcase w-5"></i> Resultados
+            </button>
+        </nav>
+        <div class="p-6 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-sm font-bold dark:text-white truncate pr-2" title="{{ user.nome }}">{{ user.nome }}</p>
+                <div class="flex items-center gap-3">
+                    <button onclick="abrirConfiguracoes()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
+                    <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+                </div>
+            </div>
+            <a href="/logout" class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-power-off"></i> Sair da Conta
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 h-full overflow-y-auto p-8 relative">
+
+        <!-- CARREGANDO -->
+        <div id="loader-overlay" class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
+            <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700">
+                <i class="fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4"></i>
+                <h2 class="text-xl font-black dark:text-white">Varrendo a Internet...</h2>
+                <p class="text-slate-500 text-sm mt-2">Isso pode levar alguns segundos.</p>
+            </div>
+        </div>
+
+        <!-- ABA RADARES -->
+        <section id="tab-filtros" class="tab-content active max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-3xl font-black dark:text-white">Meus Radares</h2>
+                    <p class="text-slate-500 text-sm mt-1">Gerencie suas buscas automáticas</p>
+                </div>
+                <button onclick="openModal()" class="bg-brand hover:bg-brandHover text-white px-5 py-3 rounded-xl shadow-lg shadow-brand/30 font-bold flex items-center gap-2 transition-all active:scale-95">
+                    <i class="fa-solid fa-plus"></i> Novo Radar
+                </button>
+            </div>
+            <div id="grid-filtros" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS -->
+            </div>
+        </section>
+
+        <!-- ABA RESULTADOS -->
+        <section id="tab-resultados" class="tab-content max-w-6xl mx-auto flex-col h-[85vh] hidden">
+            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h2 class="text-3xl font-black dark:text-white">Oportunidades</h2>
+                <div class="bg-white dark:bg-darkCard inline-flex p-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <button onclick="mudarSubAba('radar')" id="btn-sub-radar" class="px-5 py-2 rounded-lg text-sm font-bold bg-brand text-white shadow transition-all">Por Radar</button>
+                    <button onclick="mudarSubAba('vagas')" id="btn-sub-vagas" class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas as Vagas</button>
+                    <button onclick="mudarSubAba('concursos')" id="btn-sub-concursos" class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todos os Concursos</button>
+                </div>
+            </div>
+
+            <!-- BARRA DE FILTROS -->
+            <div id="barra-filtros-locais" class="hidden bg-white dark:bg-darkCard p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex-wrap xl:flex-nowrap gap-4 items-center transition-all">
+                <div class="flex-1 relative min-w-[200px]">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="filtro-texto" onkeyup="filtrarResultadosLocais()" placeholder="Ex: Python Junior, QA..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white transition-colors">
+                </div>
+                <div class="w-full md:w-48 relative">
+                    <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="filtro-local" onkeyup="filtrarResultadosLocais()" placeholder="Ex: Salvador, Remoto" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white transition-colors">
+                </div>
+                <div class="w-full md:w-48 relative">
+                    <i class="fa-solid fa-robot absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
+                    <select id="filtro-scraper" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                        <option value="todos">Qualquer Site</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-56 relative">
+                    <i class="fa-solid fa-sort absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
+                    <select id="filtro-ordem" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                        <option value="data-recente" class="font-bold">Mais Recentes (Data Real)</option>
+                        <option value="data-antiga">Mais Antigas (Data Real)</option>
+                        <option value="recentes">Últimas Coletadas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="area-resultados" class="overflow-y-auto pb-20 pr-2"></div>
+        </section>
+    </main>
+
+    <!-- MODAL DE CONFIGURAÇÕES GERAIS -->
+    <div id="modal-config" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl" id="modal-config-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black dark:text-white"><i class="fa-solid fa-gear text-brand mr-2"></i> Configurações</h3>
+                <button onclick="fecharConfiguracoes()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="form-config" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">Limpeza Automática de Vagas</label>
+                    <select id="cfg-limpeza" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-bold dark:text-white outline-none focus:border-brand transition-colors">
+                        <option value="0">Desativada</option>
+                        <option value="1">A cada 1 Mês</option>
+                        <option value="2">A cada 2 Meses</option>
+                        <option value="3">A cada 3 Meses</option>
+                    </select>
+                </div>
+
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex gap-3 shadow-sm">
+                    <i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5 text-lg"></i>
+                    <p class="text-xs text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
+                        <strong>Política do Sistema:</strong> Para garantir o desempenho, todas as vagas no banco que atingirem <span class="text-red-600 dark:text-red-400 font-black">4 meses</span> desde o momento da extração serão excluídas automaticamente, independentemente desta opção.
+                    </p>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-brand dark:hover:bg-brandHover text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar Preferências
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURAÇÃO DE RADAR -->
+    <div id="modal-filtro" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl p-8 max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl" id="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black dark:text-white" id="modal-title">Configurar Radar</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="form-filtro" class="space-y-6">
+                <input type="hidden" id="f-id">
+
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="col-span-2">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Tipo de Busca</label>
+                        <select id="f-tipo" onchange="atualizarScrapers()" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
+                            <option value="Vagas">Setor Privado (Vagas CLT/PJ)</option>
+                            <option value="Concursos">Setor Público (Concursos)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Nome do Radar</label>
+                        <input type="text" id="f-nome" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: Desenvolvedor Backend Python" required>
+                    </div>
+
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Termos (Exatos)</label>
+                        <input type="text" id="f-termos" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: java, python, qa" required>
+                    </div>
+
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i class="fa-solid fa-ban text-red-400"></i> Palavras Proibidas</label>
+                        <input type="text" id="f-proibidas" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-red-400 transition-colors" placeholder="Ex: sênior, pleno">
+                    </div>
+
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Localização</label>
+                        <input type="text" id="f-local" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: Remoto, Brasil, SP">
+                    </div>
+
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Data Limite da Vaga</label>
+                        <input type="date" id="f-data-max" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors cursor-pointer" required>
+                    </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wider uppercase">Motores de Busca</label>
+                        <div id="lista-scrapers" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                    </div>
+
+                    <div class="col-span-2 bg-brand/5 border border-brand/20 p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 mt-2">
+                        <div>
+                            <p class="font-bold text-brand flex items-center gap-2"><i class="fa-solid fa-stopwatch"></i> Automação do Radar</p>
+                            <p class="text-xs text-slate-500 mt-1">Busca automática a cada X minutos.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl">
+                                <input type="number" id="f-intervalo" min="5" value="60" class="w-16 bg-transparent text-sm font-bold dark:text-white outline-none text-center">
+                                <span class="text-xs font-semibold text-slate-400">MIN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-slate-800 dark:bg-brand hover:bg-slate-900 dark:hover:bg-brandHover text-white font-bold py-4 rounded-xl mt-6 transition-all shadow-lg shadow-brand/20 active:scale-[0.98]">
+                    <i class="fa-solid fa-floppy-disk mr-2"></i> Salvar Radar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const scrapersVagas = ["Empregos", "InfoJobs", "Gupy", "LinkedIn", "Indeed", "Programathor", "Remotar"];
+        const scrapersConcursos = ["PCI", "C_Brasil", "Gran", "Folha_QC"];
+        let filtrosAtuais = [];
+        let resultadosGlobais = [];
+        let subAbaAtual = 'radar';
+        let radarAtivoId = null;
+        let toastTimeout; 
+
+        if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function setDateTo30DaysAgo() {
+            let d = new Date();
+            d.setDate(d.getDate() - 30);
+            document.getElementById('f-data-max').value = d.toISOString().split('T')[0];
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            t.classList.remove('opacity-0', '-translate-y-4');
+            t.classList.add('opacity-100', 'translate-y-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                t.classList.remove('opacity-100', 'translate-y-0');
+                t.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+        }
+
+        // --- LÓGICA DO MODAL DE CONFIGURAÇÕES (AUTO-LIMPEZA) ---
+        async function abrirConfiguracoes() {
+            try {
+                const res = await fetch('/api/usuario/config');
+                const cfg = await res.json();
+                const select = document.getElementById('cfg-limpeza');
+                if(cfg.ativa) { select.value = cfg.meses.toString(); } 
+                else { select.value = "0"; }
+                
+                document.getElementById('modal-config').classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('modal-config-content').classList.remove('scale-95');
+            } catch(e) { showToast("Erro ao ler configurações."); }
+        }
+
+        function fecharConfiguracoes() {
+            document.getElementById('modal-config').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('modal-config-content').classList.add('scale-95');
+        }
+
+        document.getElementById('form-config').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const val = parseInt(document.getElementById('cfg-limpeza').value);
+            const payload = {
+                ativa: val > 0,
+                meses: val > 0 ? val : 3
+            };
+            try {
+                const res = await fetch('/api/usuario/config', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                showToast(data.mensagem || "Salvo com sucesso!");
+                fecharConfiguracoes();
+            } catch(e) { showToast("Erro ao salvar."); }
+        });
+
+        // --- LÓGICA DOS RADARES ---
+        async function toggleTimerRapido(id) {
+            try {
+                const res = await fetch(`/api/filtros/${id}/toggle`, { method: 'PATCH' });
+                const data = await res.json();
+                showToast(data.mensagem);
+                carregarFiltros();
+            } catch (error) { showToast("Erro ao alterar automação."); }
+        }
+
+        function changeTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.querySelectorAll('nav button').forEach(e => {
+                e.classList.remove('bg-brand/10', 'text-brand', 'font-medium');
+                e.classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+            const btn = document.getElementById(`nav-${tab}`);
+            btn.classList.add('bg-brand/10', 'text-brand', 'font-medium');
+            btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+        }
+
+        function openModal() {
+            document.getElementById('f-id').value = '';
+            document.getElementById('form-filtro').reset();
+            setDateTo30DaysAgo(); 
+            document.getElementById('modal-title').innerText = "Criar Novo Radar";
+            document.getElementById('f-intervalo').value = "60";
+            atualizarScrapers();
+            document.getElementById('modal-filtro').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('modal-content').classList.remove('scale-95');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-filtro').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('modal-content').classList.add('scale-95');
+        }
+
+        function atualizarScrapers(scrapersMarcados = []) {
+            const tipo = document.getElementById('f-tipo').value;
+            const lista = tipo === 'Vagas' ? scrapersVagas : scrapersConcursos;
+            document.getElementById('lista-scrapers').innerHTML = lista.map(s => {
+                const isChecked = scrapersMarcados.length > 0 ? scrapersMarcados.includes(s) : true;
+                return `
+                <label class="flex items-center gap-3 bg-white dark:bg-slate-900 border ${isChecked ? 'border-brand' : 'border-slate-200 dark:border-slate-700'} p-3 rounded-xl cursor-pointer hover:border-brand/50 transition-colors shadow-sm">
+                    <input type="checkbox" value="${s}" class="form-scrapers w-4 h-4 accent-brand" ${isChecked ? 'checked' : ''} onchange="this.parentElement.classList.toggle('border-brand')">
+                    <span class="text-sm font-medium dark:text-slate-200 truncate">${s}</span>
+                </label>`;
+            }).join('');
+        }
+
+        async function carregarFiltros() {
+            try {
+                const res = await fetch('/api/filtros');
+                filtrosAtuais = await res.json();
+                const grid = document.getElementById('grid-filtros');
+                grid.innerHTML = '';
+
+                if (!filtrosAtuais || filtrosAtuais.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-20 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-500 font-medium">Você não tem nenhum Radar ativado.<br>Clique em 'Novo Radar' para começar a minerar a internet.</div>`;
+                    return;
+                }
+
+                filtrosAtuais.forEach(f => {
+                    const nomeStr = f.nome_filtro || "Radar sem nome";
+                    const termosStr = f.termos || "Sem termos";
+                    const localStr = f.localizacao || "Qualquer lugar";
+                    const scrapersStr = f.scrapers || "Nenhum";
+                    const diasMax = f.max_dias || 30;
+
+                    const isVaga = f.tipo_busca === 'Vagas';
+                    const tagColor = isVaga ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/40 dark:text-fuchsia-300';
+                    
+                    let limiteDate = new Date();
+                    limiteDate.setDate(limiteDate.getDate() - diasMax);
+                    let limiteStr = limiteDate.toLocaleDateString('pt-BR');
+
+                    let ultimaVarreduraTexto = "Nunca executado";
+                    if (f.ultima_varredura) {
+                        const dataObj = new Date(f.ultima_varredura);
+                        ultimaVarreduraTexto = dataObj.toLocaleDateString('pt-BR') + ' às ' + dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    }
+                    
+                    const listArr = scrapersStr.split(',');
+                    const scrapersLimitados = listArr.slice(0, 3).join(', ') + (listArr.length > 3 ? '...' : '');
+
+                    grid.innerHTML += `
+                    <div class="bg-white dark:bg-darkCard rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm relative hover:shadow-lg transition-all group flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-[10px] font-extrabold ${tagColor} px-2.5 py-1 rounded-md uppercase tracking-wide border border-transparent dark:border-white/10">${f.tipo_busca}</span>
+                            <div class="flex items-center gap-2" title="Ligar/Desligar Automação">
+                                <span class="text-[10px] font-bold ${f.timer_ativo ? 'text-brand' : 'text-slate-400'} uppercase">${f.timer_ativo ? 'Auto' : 'Parado'}</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" ${f.timer_ativo ? 'checked' : ''} onchange="toggleTimerRapido(${f.id})">
+                                    <div class="w-9 h-5 bg-slate-300 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-black dark:text-white leading-tight mb-4 pr-10 line-clamp-2" title="${nomeStr}">${nomeStr}</h3>
+                        <div class="mb-6 text-xs space-y-2 text-slate-500 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                            <p class="flex items-start gap-2"><i class="fa-solid fa-magnifying-glass text-slate-400 mt-0.5"></i> <span class="line-clamp-1 flex-1" title="${termosStr}">${termosStr}</span></p>
+                            <p class="flex items-start gap-2"><i class="fa-solid fa-location-dot text-slate-400 mt-0.5"></i> <span class="line-clamp-1 flex-1" title="${localStr}">${localStr}</span></p>
+                            <p class="flex items-start gap-2"><i class="fa-solid fa-robot text-slate-400 mt-0.5"></i> <span class="line-clamp-1 flex-1" title="${scrapersStr}">${scrapersLimitados}</span></p>
+                            <p class="flex items-start gap-2"><i class="fa-regular fa-calendar-xmark text-slate-400 mt-0.5"></i> <span class="flex-1">Buscar até: <strong class="text-slate-700 dark:text-slate-300">${limiteStr}</strong></span></p>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/50 flex justify-between items-center">
+                            <div class="flex items-center gap-1.5">
+                                <i class="fa-solid fa-clock-rotate-left text-brand"></i>
+                                <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Última: <br><span class="text-slate-700 dark:text-slate-200">${ultimaVarreduraTexto}</span></span>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="editarFiltro(${f.id})" class="text-slate-400 hover:text-brand bg-slate-50 dark:bg-slate-800 p-2 rounded-lg transition-colors border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deletarFiltro(${f.id})" class="text-slate-400 hover:text-red-500 bg-slate-50 dark:bg-slate-800 p-2 rounded-lg transition-colors border border-slate-200 dark:border-slate-700"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <button onclick="rodarFiltro(${f.id})" class="w-full mt-4 bg-brand text-white font-bold py-3 rounded-xl hover:bg-brandHover transition-colors shadow-md shadow-brand/20 active:scale-[0.98] flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-radar"></i> Iniciar Varredura
+                        </button>
+                    </div>`;
+                });
+            } catch (e) {}
+        }
+
+        function editarFiltro(id) {
+            const f = filtrosAtuais.find(x => x.id === id);
+            if (!f) return;
+            document.getElementById('modal-title').innerText = "Editar Radar";
+            document.getElementById('f-id').value = f.id;
+            document.getElementById('f-tipo').value = f.tipo_busca;
+            document.getElementById('f-nome').value = f.nome_filtro;
+            document.getElementById('f-termos').value = f.termos;
+            document.getElementById('f-local').value = f.localizacao;
+            document.getElementById('f-proibidas').value = f.palavras_proibidas;
+            
+            let d = new Date();
+            d.setDate(d.getDate() - (f.max_dias || 30));
+            document.getElementById('f-data-max').value = d.toISOString().split('T')[0];
+            
+            document.getElementById('f-intervalo').value = f.intervalo_timer;
+            atualizarScrapers((f.scrapers || '').split(','));
+            document.getElementById('modal-filtro').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('modal-content').classList.remove('scale-95');
+        }
+
+        document.getElementById('form-filtro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let scrapers = [];
+            document.querySelectorAll('.form-scrapers:checked').forEach(el => scrapers.push(el.value));
+            if (scrapers.length === 0) { alert("Selecione pelo menos um motor de busca!"); return; }
+
+            const dataEscolhida = new Date(document.getElementById('f-data-max').value + "T12:00:00");
+            const diffTime = Math.max(0, new Date() - dataEscolhida);
+            let diasCalculados = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diasCalculados <= 0) diasCalculados = 1;
+
+            const payload = {
+                tipo_busca: document.getElementById('f-tipo').value,
+                nome_filtro: document.getElementById('f-nome').value,
+                termos: document.getElementById('f-termos').value,
+                palavras_proibidas: document.getElementById('f-proibidas').value,
+                localizacao: document.getElementById('f-local').value,
+                formato: "Padrão",
+                scrapers: scrapers.join(','),
+                max_dias: diasCalculados,
+                timer_ativo: false, 
+                intervalo_timer: parseInt(document.getElementById('f-intervalo').value)
+            };
+
+            const id = document.getElementById('f-id').value;
+            const url = id ? `/api/filtros?id=${id}` : '/api/filtros';
+
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (res.ok) { closeModal(); showToast("Radar salvo!"); carregarFiltros(); }
+        });
+
+        async function deletarFiltro(id) {
+            if (confirm("Tem certeza que deseja apagar este radar permanentemente?")) {
+                await fetch(`/api/filtros/${id}`, { method: 'DELETE' });
+                showToast("Radar apagado.");
+                carregarFiltros();
+            }
+        }
+
+        async function rodarFiltro(id) {
+            document.getElementById('loader-overlay').classList.remove('hidden');
+            document.getElementById('loader-overlay').classList.add('flex');
+            try {
+                const res = await fetch(`/api/filtros/${id}/rodar`, { method: 'POST' });
+                const data = await res.json();
+                showToast(data.mensagem);
+                changeTab('resultados');
+                carregarResultados();
+            } catch (e) { showToast("Erro na conexão com o robô."); }
+            document.getElementById('loader-overlay').classList.add('hidden');
+            document.getElementById('loader-overlay').classList.remove('flex');
+        }
+
+        function parseDataReal(dataStr) {
+            if (!dataStr) return new Date(2000, 0, 1);
+            let s = dataStr.toLowerCase();
+            let hoje = new Date(); 
+            if (s.includes('hoje') || s.includes('recente') || s.includes('agora') || s.includes('hora') || s.includes('minuto')) return hoje;
+            if (s.includes('ontem')) { hoje.setDate(hoje.getDate() - 1); return hoje; }
+
+            let numMatch = s.match(/\d+/);
+            if (numMatch && s.includes('há') && !s.includes('/')) {
+                let num = parseInt(numMatch[0]);
+                if (s.includes('mês') || s.includes('meses')) num *= 30;
+                else if (s.includes('ano') || s.includes('anos')) num *= 365;
+                else if (s.includes('semana') || s.includes('semanas')) num *= 7;
+                hoje.setDate(hoje.getDate() - num);
+                return hoje;
+            }
+
+            let pt1 = s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+            if (pt1) return new Date(`${pt1[3]}-${pt1[2]}-${pt1[1]}T12:00:00`);
+            let pt2 = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+            if (pt2) return new Date(`${pt2[1]}-${pt2[2]}-${pt2[3]}T12:00:00`);
+            return new Date(2000, 0, 1);
+        }
+
+        function mudarSubAba(aba) {
+            subAbaAtual = aba;
+            radarAtivoId = null;
+            ['radar', 'vagas', 'concursos'].forEach(id => {
+                document.getElementById(`btn-sub-${id}`).className = `px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all`;
+            });
+            document.getElementById(`btn-sub-${aba}`).className = `px-5 py-2 rounded-lg text-sm font-bold bg-brand text-white shadow transition-all`;
+            document.getElementById('barra-filtros-locais').style.display = (aba === 'radar') ? 'none' : 'flex';
+            document.getElementById('filtro-texto').value = '';
+            document.getElementById('filtro-local').value = '';
+            document.getElementById('filtro-ordem').value = 'data-recente';
+
+            const selectScraper = document.getElementById('filtro-scraper');
+            let opcoesHtml = '<option value="todos">Qualquer Site</option>';
+            if (aba === 'vagas') { scrapersVagas.forEach(s => { opcoesHtml += `<option value="${s}">${s}</option>`; }); } 
+            else if (aba === 'concursos') { scrapersConcursos.forEach(s => { opcoesHtml += `<option value="${s}">${s}</option>`; }); }
+            selectScraper.innerHTML = opcoesHtml;
+            renderizarResultados();
+        }
+
+        async function carregarResultados() {
+            try {
+                const res = await fetch('/api/resultados');
+                resultadosGlobais = await res.json();
+                renderizarResultados();
+            } catch(e) {}
+        }
+
+        function filtrarResultadosLocais() { renderizarResultados(); }
+
+        async function limparVagasRadar(id) {
+            if (confirm("Tem certeza que deseja apagar TODAS as vagas deste radar? O radar continuará existindo.")) {
+                try {
+                    const res = await fetch(`/api/filtros/${id}/vagas`, { method: 'DELETE' });
+                    if(res.ok) {
+                        showToast("Vagas limpas com sucesso!");
+                        await carregarResultados(); 
+                    } else { showToast("Erro ao limpar vagas."); }
+                } catch(e) {}
+            }
+        }
+
+        async function deletarVagaIndividual(id) {
+            if (confirm("Tem certeza que deseja excluir esta oportunidade?")) {
+                try {
+                    const res = await fetch(`/api/resultados/${id}`, { method: 'DELETE' });
+                    if(res.ok) {
+                        showToast("Vaga excluída!");
+                        resultadosGlobais = resultadosGlobais.filter(v => v.id !== id);
+                        renderizarResultados(); 
+                    } else { showToast("Erro ao excluir."); }
+                } catch(e) {}
+            }
+        }
+
+        function renderizarResultados() {
+            const area = document.getElementById('area-resultados');
+            if (!resultadosGlobais || resultadosGlobais.length === 0) {
+                area.innerHTML = `
+                <div class="text-center py-20 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 mt-8">
+                    <i class="fa-solid fa-box-open text-5xl mb-4 text-slate-300 dark:text-slate-600"></i>
+                    <h3 class="text-xl font-bold dark:text-white mb-2">Cofre Vazio</h3>
+                    <p class="text-slate-500 dark:text-slate-400">Rode um radar para preencher seus resultados.</p>
+                </div>`;
+                return;
+            }
+
+            if (subAbaAtual === 'radar' && radarAtivoId === null) {
+                let grupos = {};
+                filtrosAtuais.forEach(f => { grupos[f.id] = { nome: f.nome_filtro || 'Sem Nome', tipo: f.tipo_busca, qtd: 0 }; });
+                resultadosGlobais.forEach(v => { if (v.filtro_id && grupos[v.filtro_id]) grupos[v.filtro_id].qtd++; });
+
+                let htmlGrid = '<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-4">';
+                for (const id in grupos) {
+                    const g = grupos[id];
+                    const icon = g.tipo === 'Vagas' ? 'fa-briefcase text-brand' : 'fa-landmark text-fuchsia-500';
+                    const bg = g.tipo === 'Vagas' ? 'bg-brand/10 dark:bg-brand/20' : 'bg-fuchsia-50 dark:bg-fuchsia-900/20';
+                    
+                    htmlGrid += `
+                    <div onclick="abrirRadarResultados(${id})" class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-brand cursor-pointer transition-all flex flex-col items-center text-center group">
+                        <div class="w-16 h-16 rounded-2xl ${bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-transparent group-hover:border-brand/20">
+                            <i class="fa-solid ${icon} text-2xl"></i>
+                        </div>
+                        <h4 class="text-lg font-bold dark:text-white mb-1 line-clamp-1 w-full px-2" title="${g.nome}">${g.nome}</h4>
+                        <span class="text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full">${g.qtd} resultados</span>
+                    </div>`;
+                }
+                area.innerHTML = htmlGrid + '</div>';
+                return;
+            }
+
+            let listaFiltrada = [];
+            let tituloPagina = "";
+            let dataLimiteRadar = null;
+
+            if (subAbaAtual === 'radar' && radarAtivoId !== null) {
+                listaFiltrada = resultadosGlobais.filter(v => v.filtro_id === radarAtivoId);
+                const radarObj = filtrosAtuais.find(f => f.id === radarAtivoId);
+                if(radarObj) {
+                    dataLimiteRadar = new Date();
+                    dataLimiteRadar.setDate(dataLimiteRadar.getDate() - (radarObj.max_dias || 30));
+                    dataLimiteRadar.setHours(0,0,0,0);
+                }
+
+                tituloPagina = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <button onclick="fecharRadar()" class="w-10 h-10 shrink-0 flex items-center justify-center bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-700 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 hover:scale-105 transition-all shadow-sm"><i class="fa-solid fa-arrow-left dark:text-white"></i></button>
+                        <h3 class="text-xl font-bold dark:text-white truncate">Resultados do Radar: <span class="text-brand">${radarObj ? radarObj.nome_filtro : ''}</span></h3>
+                    </div>
+                    <button onclick="limparVagasRadar(${radarAtivoId})" class="shrink-0 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-500 border border-red-200 dark:border-red-500/30 px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-broom"></i> Esvaziar Vagas
+                    </button>
+                </div>`;
+            } else if (subAbaAtual === 'vagas') {
+                listaFiltrada = resultadosGlobais.filter(v => v.tipo_busca === 'Vagas');
+            } else if (subAbaAtual === 'concursos') {
+                listaFiltrada = resultadosGlobais.filter(v => v.tipo_busca === 'Concursos');
+            }
+
+            if(dataLimiteRadar) {
+                listaFiltrada = listaFiltrada.filter(v => parseDataReal(v.data_publicacao) >= dataLimiteRadar);
+            }
+
+            const tTexto = document.getElementById('filtro-texto').value.toLowerCase();
+            const tLocal = document.getElementById('filtro-local').value.toLowerCase();
+            const tScraper = document.getElementById('filtro-scraper').value;
+            const tOrdem = document.getElementById('filtro-ordem') ? document.getElementById('filtro-ordem').value : 'data-recente';
+
+            if (tTexto) listaFiltrada = listaFiltrada.filter(v => (v.titulo || '').toLowerCase().includes(tTexto) || ((v.empresa || '').toLowerCase().includes(tTexto)));
+            if (tLocal) listaFiltrada = listaFiltrada.filter(v => (v.local || '').toLowerCase().includes(tLocal));
+            if (tScraper !== 'todos') listaFiltrada = listaFiltrada.filter(v => v.scraper === tScraper);
+
+            if (tOrdem === 'recentes') {
+                listaFiltrada.sort((a, b) => b.id - a.id); 
+            } else if (tOrdem === 'data-recente') {
+                listaFiltrada.sort((a, b) => parseDataReal(b.data_publicacao) - parseDataReal(a.data_publicacao)); 
+            } else if (tOrdem === 'data-antiga') {
+                listaFiltrada.sort((a, b) => parseDataReal(a.data_publicacao) - parseDataReal(b.data_publicacao)); 
+            }
+
+            if (listaFiltrada.length === 0) {
+                area.innerHTML = tituloPagina + `<div class="text-center py-10 text-slate-500 font-medium">Nenhuma oportunidade atende a esses filtros.</div>`;
+            } else {
+                area.innerHTML = tituloPagina + `<p class="text-sm font-bold text-slate-400 mb-4">${listaFiltrada.length} oportunidades filtradas</p>` + gerarGridDeCards(listaFiltrada);
+            }
+        }
+
+        function abrirRadarResultados(id) {
+            radarAtivoId = id;
+            document.getElementById('barra-filtros-locais').style.display = 'flex';
+            const radar = filtrosAtuais.find(f => f.id === id);
+            const selectScraper = document.getElementById('filtro-scraper');
+            let opcoesHtml = '<option value="todos">Todos Sites do Radar</option>';
+            if(radar && radar.scrapers) {
+                radar.scrapers.split(',').forEach(site => { opcoesHtml += `<option value="${site.trim()}">${site.trim()}</option>`; });
+            }
+            selectScraper.innerHTML = opcoesHtml;
+            renderizarResultados();
+        }
+
+        function fecharRadar() {
+            radarAtivoId = null;
+            document.getElementById('barra-filtros-locais').style.display = 'none';
+            renderizarResultados();
+        }
+
+        function gerarGridDeCards(lista) {
+            return `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">` +
+                lista.map(v => `
+                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm relative group flex flex-col h-full hover:shadow-xl hover:-translate-y-1 hover:border-brand/50 transition-all duration-300">
+                    <div class="flex justify-between items-start gap-3 mb-3 w-full overflow-hidden">
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 min-w-0" title="${v.empresa || 'Confidencial'}">
+                            <i class="fa-regular fa-building shrink-0"></i>
+                            <span class="truncate">${v.empresa || 'Confidencial'}</span>
+                        </span>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-[10px] font-black bg-brand/10 text-brand px-2 py-1 rounded-md uppercase tracking-wide border border-brand/20 shadow-sm truncate max-w-[80px]" title="${v.scraper || 'Site'}">
+                                ${v.scraper || 'Site'}
+                            </span>
+                            <button onclick="deletarVagaIndividual(${v.id})" class="w-6 h-6 flex justify-center items-center rounded-md bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-slate-700 transition-all opacity-0 group-hover:opacity-100" title="Excluir esta vaga">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h4 class="text-lg font-black dark:text-white mb-4 leading-snug group-hover:text-brand transition-colors line-clamp-2" title="${v.titulo || 'Vaga'}">
+                        ${v.titulo || 'Vaga'}
+                    </h4>
+                    <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                        <span class="flex items-center gap-1.5 text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-700/50 min-w-0 max-w-full" title="${v.local || 'N/A'}">
+                            <i class="fa-solid fa-location-dot text-brand shrink-0"></i> <span class="truncate">${v.local || 'N/A'}</span>
+                        </span>
+                        <span class="flex items-center gap-1.5 text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-700/50 whitespace-nowrap">
+                            <i class="fa-regular fa-clock text-brand"></i> ${v.data_publicacao || 'Recente'}
+                        </span>
+                    </div>
+                    <a href="${v.link || '#'}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-sm font-black text-white bg-slate-800 hover:bg-slate-900 dark:bg-brand dark:hover:bg-brandHover py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98]">
+                        Ver Vaga <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70"></i>
+                    </a>
+                </div>
+            `).join('') + `</div>`;
+        }
+        
+        carregarFiltros();
+    </script>
+</body>
+</html>
