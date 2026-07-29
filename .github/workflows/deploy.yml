@@ -1,0 +1,22 @@
+name: Deploy Automático Vagaz
+
+on:
+  push:
+    branches:
+      - main  # Se a sua branch principal tiver outro nome (como master), troque aqui
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Executar comandos no servidor Oracle
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/Vagaz
+            git pull origin main
+            sudo docker-compose up --build -d
