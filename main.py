@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from scrapers.gupy import buscar_vagas_gupy
 from scrapers.linkedin import buscar_vagas_linkedin
-from scrapers.indeed import buscar_vagas_indeed
+from scrapers.solides import buscar_vagas_solides
 from scrapers.programathor import buscar_vagas_programathor
 from scrapers.remotar import buscar_vagas_remotar
 from scrapers.pci import buscar_concursos_pci 
@@ -103,7 +103,7 @@ async def login_usuario(request: Request, response: Response, db = Depends(get_d
             raise HTTPException(status_code=401, detail="E-mail ou senha incorretos.")
         
         # 5. Sucesso e Cookie
-        tempo_expiracao = 2592000 if lembrar_me else 86400 
+        tempo_expiracao = 604800 if lembrar_me else 86400
         response.set_cookie(key="vagaz_user_id", value=str(usuario.id), max_age=tempo_expiracao, httponly=True)
         
         log_admin(f"✅ [RAIO-X] LOGIN APROVADO! Usuário: {usuario.nome} (Admin: {usuario.is_admin})")
@@ -273,17 +273,17 @@ def executar_varredura(filtro_id: int):
                 log_admin(f"Buscando '{f_db.termos}' em {f_db.localizacao}...", scraper)
                 
                 resultados_scraper = []
-                if scraper == "Empregos": resultados_scraper = buscar_vagas_empregos(f_db.termos, 2, headless=scraper_headless)
+                if scraper == "Empregos": resultados_scraper = buscar_vagas_empregos(f_db.termos, 3, headless=scraper_headless)
                 elif scraper == "InfoJobs": resultados_scraper = buscar_vagas_infojobs(f_db.termos + " " + f_db.localizacao, 2, headless=scraper_headless)
                 elif scraper == "Gupy": resultados_scraper = buscar_vagas_gupy(f_db.termos, 4, headless=scraper_headless)
-                elif scraper == "LinkedIn": resultados_scraper = buscar_vagas_linkedin(f_db.termos, f_db.localizacao, 2, headless=scraper_headless)
-                elif scraper == "Indeed": resultados_scraper = buscar_vagas_indeed(f_db.termos, f_db.localizacao, 2, headless=scraper_headless)
+                elif scraper == "LinkedIn": resultados_scraper = buscar_vagas_linkedin(f_db.termos, f_db.localizacao, 4, headless=scraper_headless)
+                elif scraper == "Solides": resultados_scraper = buscar_vagas_solides(f_db.termos, f_db.localizacao, 4, headless=scraper_headless)
                 elif scraper == "Programathor": resultados_scraper = buscar_vagas_programathor(f_db.termos, 2, headless=scraper_headless)
-                elif scraper == "Remotar": resultados_scraper = buscar_vagas_remotar(f_db.termos, 2, headless=scraper_headless)
-                elif scraper == "PCI": resultados_scraper = buscar_concursos_pci(f_db.termos, headless=scraper_headless)
-                elif scraper == "C_Brasil": resultados_scraper = buscar_concursos_brasil(f_db.termos, headless=scraper_headless)
-                elif scraper == "Gran": resultados_scraper = buscar_concursos_gran(f_db.termos, headless=scraper_headless)
-                elif scraper == "Folha_QC": resultados_scraper = buscar_concursos_folha(f_db.termos, headless=scraper_headless)
+                elif scraper == "Remotar": resultados_scraper = buscar_vagas_remotar(f_db.termos, 3, headless=scraper_headless)
+                elif scraper == "PCI Concursos": resultados_scraper = buscar_concursos_pci(f_db.termos, headless=scraper_headless)
+                elif scraper == "Concursos Brasil": resultados_scraper = buscar_concursos_brasil(f_db.termos, headless=scraper_headless)
+                elif scraper == "Gran Concursos": resultados_scraper = buscar_concursos_gran(f_db.termos, headless=scraper_headless)
+                elif scraper == "Folha QC": resultados_scraper = buscar_concursos_folha(f_db.termos, headless=scraper_headless)
 
                 # --- FORÇA A ASSINATURA E A GARANTIA DE DADOS ---
                 for res in resultados_scraper:
@@ -603,6 +603,33 @@ def get_all_users(db = Depends(get_db)):
             "filtros": [{"id": f.id, "termo": f.termos} for f in filtros]
         })
     return users_data
+
+class UserEdit(BaseModel):
+    nome: str
+    email: str
+    senha: Optional[str] = None # Opcional, caso o admin só queira mudar o nome/email
+
+@app.put("/api/admin/usuarios/{user_id}")
+def edit_user_admin(user_id: int, dados: UserEdit, db = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user: raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+    
+    # Verifica se o e-mail novo já pertence a outra pessoa
+    if dados.email != user.email:
+        email_em_uso = db.query(User).filter(User.email == dados.email).first()
+        if email_em_uso:
+            raise HTTPException(status_code=400, detail="Este e-mail já está cadastrado em outra conta.")
+            
+    user.nome = dados.nome
+    user.email = dados.email
+    
+    # Só atualiza a senha se o admin digitou algo no campo
+    if dados.senha and len(dados.senha) >= 6:
+        user.senha_hash = bcrypt.hashpw(dados.senha.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+    db.commit()
+    log_admin(f"Usuário ID {user_id} ({user.nome}) editado com sucesso.", "SISTEMA")
+    return {"mensagem": "Usuário atualizado com sucesso!"}
 
 @app.get("/api/admin/db/tables")
 def get_tables_info(db = Depends(get_db)):

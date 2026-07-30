@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +18,7 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         body {
             font-family: 'Inter', sans-serif;
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -37,17 +38,39 @@
                 radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.05) 0px, transparent 50%);
         }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .tab-content {
+            display: none;
         }
 
-        .toggle-checkbox:checked { right: 0; border-color: #0d9488; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #0d9488; }
-        #toast { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #0d9488;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #0d9488;
+        }
+
+        #toast {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
 
         select.custom-select {
             appearance: none;
@@ -59,24 +82,30 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex transition-colors">
+
+<body
+    class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex transition-colors">
 
     <!-- Notificações -->
-    <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium opacity-0 pointer-events-none transform -translate-y-4 z-50 transition-all bg-slate-900 dark:bg-brand">
+    <div id="toast"
+        class="absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium opacity-0 pointer-events-none transform -translate-y-4 z-50 transition-all bg-slate-900 dark:bg-brand">
         <span id="toast-message">Mensagem</span>
     </div>
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-white dark:bg-darkCard shadow-lg flex flex-col h-full z-20 border-r border-slate-200 dark:border-slate-800">
+    <aside
+        class="w-64 bg-white dark:bg-darkCard shadow-lg flex flex-col h-full z-20 border-r border-slate-200 dark:border-slate-800">
         <div class="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700">
             <img src="/static/Remoto.png" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
             <span class="text-3xl font-black text-brand tracking-tighter">VAGAZ</span>
         </div>
         <nav class="p-6 space-y-2 flex-1">
-            <button onclick="changeTab('filtros')" id="nav-filtros" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand/10 text-brand font-medium transition-colors">
+            <button onclick="changeTab('filtros')" id="nav-filtros"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand/10 text-brand font-medium transition-colors">
                 <i class="fa-solid fa-satellite-dish w-5"></i> Meus Radares
             </button>
-            <button onclick="changeTab('resultados'); carregarResultados();" id="nav-resultados" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium">
+            <button onclick="changeTab('resultados'); carregarResultados();" id="nav-resultados"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium">
                 <i class="fa-solid fa-briefcase w-5"></i> Resultados
             </button>
         </nav>
@@ -84,12 +113,16 @@
             <div class="flex items-center justify-between mb-4">
                 <p class="text-sm font-bold dark:text-white truncate pr-2" title="{{ user.nome }}">{{ user.nome }}</p>
                 <div class="flex items-center gap-3">
-                    <button onclick="abrirConfiguracoes()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
-                    <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+                    <button onclick="abrirConfiguracoes()"
+                        class="text-slate-400 hover:text-brand transition-colors text-lg"><i
+                            class="fa-solid fa-gear"></i></button>
+                    <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i
+                            id="theme-icon" class="fa-solid fa-moon"></i></button>
                 </div>
             </div>
-            <a href="/logout" class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2">
-                <i class="fa-solid fa-power-off"></i> Sair da Conta
+            <a href="/logout"
+                class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-power-off"></i> Sair
             </a>
         </div>
     </aside>
@@ -98,10 +131,12 @@
     <main class="flex-1 h-full overflow-y-auto p-8 relative">
 
         <!-- CARREGANDO -->
-        <div id="loader-overlay" class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
-            <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700">
+        <div id="loader-overlay"
+            class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
+            <div
+                class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700">
                 <i class="fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4"></i>
-                <h2 class="text-xl font-black dark:text-white">Varrendo a Internet...</h2>
+                <h2 class="text-xl font-black dark:text-white">Varrendo os Sites...</h2>
                 <p class="text-slate-500 text-sm mt-2">Isso pode levar alguns segundos.</p>
             </div>
         </div>
@@ -111,9 +146,10 @@
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h2 class="text-3xl font-black dark:text-white">Meus Radares</h2>
-                    <p class="text-slate-500 text-sm mt-1">Gerencie suas buscas automáticas</p>
+                    <p class="text-slate-500 text-sm mt-1">Gerencie suas buscas</p>
                 </div>
-                <button onclick="openModal()" class="bg-brand hover:bg-brandHover text-white px-5 py-3 rounded-xl shadow-lg shadow-brand/30 font-bold flex items-center gap-2 transition-all active:scale-95">
+                <button onclick="openModal()"
+                    class="bg-brand hover:bg-brandHover text-white px-5 py-3 rounded-xl shadow-lg shadow-brand/30 font-bold flex items-center gap-2 transition-all active:scale-95">
                     <i class="fa-solid fa-plus"></i> Novo Radar
                 </button>
             </div>
@@ -126,32 +162,46 @@
         <section id="tab-resultados" class="tab-content max-w-6xl mx-auto flex-col h-[85vh] hidden">
             <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 class="text-3xl font-black dark:text-white">Oportunidades</h2>
-                <div class="bg-white dark:bg-darkCard inline-flex p-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                    <button onclick="mudarSubAba('radar')" id="btn-sub-radar" class="px-5 py-2 rounded-lg text-sm font-bold bg-brand text-white shadow transition-all">Por Radar</button>
-                    <button onclick="mudarSubAba('vagas')" id="btn-sub-vagas" class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas as Vagas</button>
-                    <button onclick="mudarSubAba('concursos')" id="btn-sub-concursos" class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todos os Concursos</button>
+                <div
+                    class="bg-white dark:bg-darkCard inline-flex p-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <button onclick="mudarSubAba('radar')" id="btn-sub-radar"
+                        class="px-5 py-2 rounded-lg text-sm font-bold bg-brand text-white shadow transition-all">Por
+                        Radar</button>
+                    <button onclick="mudarSubAba('vagas')" id="btn-sub-vagas"
+                        class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas
+                        as Vagas</button>
+                    <button onclick="mudarSubAba('concursos')" id="btn-sub-concursos"
+                        class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todos
+                        os Concursos</button>
                 </div>
             </div>
 
             <!-- BARRA DE FILTROS -->
-            <div id="barra-filtros-locais" class="hidden bg-white dark:bg-darkCard p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex-wrap xl:flex-nowrap gap-4 items-center transition-all">
+            <div id="barra-filtros-locais"
+                class="hidden bg-white dark:bg-darkCard p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex-wrap xl:flex-nowrap gap-4 items-center transition-all">
                 <div class="flex-1 relative min-w-[200px]">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="filtro-texto" onkeyup="filtrarResultadosLocais()" placeholder="Ex: Python Junior, QA..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white transition-colors">
+                    <input type="text" id="filtro-texto" onkeyup="filtrarResultadosLocais()"
+                        placeholder="Ex: Python Junior, QA..."
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white transition-colors">
                 </div>
                 <div class="w-full md:w-48 relative">
                     <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="filtro-local" onkeyup="filtrarResultadosLocais()" placeholder="Ex: Salvador, Remoto" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white transition-colors">
+                    <input type="text" id="filtro-local" onkeyup="filtrarResultadosLocais()"
+                        placeholder="Ex: Salvador, Remoto"
+                        class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white transition-colors">
                 </div>
                 <div class="w-full md:w-48 relative">
                     <i class="fa-solid fa-robot absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
-                    <select id="filtro-scraper" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                    <select id="filtro-scraper" onchange="filtrarResultadosLocais()"
+                        class="custom-select w-full pl-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
                         <option value="todos">Qualquer Site</option>
                     </select>
                 </div>
                 <div class="w-full md:w-56 relative">
                     <i class="fa-solid fa-sort absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
-                    <select id="filtro-ordem" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                    <select id="filtro-ordem" onchange="filtrarResultadosLocais()"
+                        class="custom-select w-full pl-10 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
                         <option value="data-recente" class="font-bold">Mais Recentes (Data Real)</option>
                         <option value="data-antiga">Mais Antigas (Data Real)</option>
                         <option value="recentes">Últimas Coletadas</option>
@@ -164,17 +214,24 @@
     </main>
 
     <!-- MODAL DE CONFIGURAÇÕES GERAIS -->
-    <div id="modal-config" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
-        <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl" id="modal-config-content">
+    <div id="modal-config"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl"
+            id="modal-config-content">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-black dark:text-white"><i class="fa-solid fa-gear text-brand mr-2"></i> Configurações</h3>
-                <button onclick="fecharConfiguracoes()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-2xl font-black dark:text-white"><i class="fa-solid fa-gear text-brand mr-2"></i>
+                    Configurações</h3>
+                <button onclick="fecharConfiguracoes()"
+                    class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form id="form-config" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">Limpeza Automática de Vagas</label>
-                    <select id="cfg-limpeza" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-bold dark:text-white outline-none focus:border-brand transition-colors">
+                    <label class="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">Limpeza Automática de
+                        Vagas</label>
+                    <select id="cfg-limpeza"
+                        class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-bold dark:text-white outline-none focus:border-brand transition-colors">
                         <option value="0">Desativada</option>
                         <option value="1">A cada 1 Mês</option>
                         <option value="2">A cada 2 Meses</option>
@@ -182,14 +239,18 @@
                     </select>
                 </div>
 
-                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex gap-3 shadow-sm">
+                <div
+                    class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex gap-3 shadow-sm">
                     <i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5 text-lg"></i>
                     <p class="text-xs text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
-                        <strong>Política do Sistema:</strong> Para garantir o desempenho, todas as vagas no banco que atingirem <span class="text-red-600 dark:text-red-400 font-black">4 meses</span> desde o momento da extração serão excluídas automaticamente, independentemente desta opção.
+                        <strong>Política do Sistema:</strong> Para garantir o desempenho, todas as vagas no banco que
+                        atingirem <span class="text-red-600 dark:text-red-400 font-black">4 meses</span> desde o momento
+                        da extração serão excluídas automaticamente, independentemente desta opção.
                     </p>
                 </div>
 
-                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-brand dark:hover:bg-brandHover text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                <button type="submit"
+                    class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-brand dark:hover:bg-brandHover text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-floppy-disk"></i> Salvar Preferências
                 </button>
             </form>
@@ -197,11 +258,14 @@
     </div>
 
     <!-- MODAL DE CONFIGURAÇÃO DE RADAR -->
-    <div id="modal-filtro" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
-        <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl p-8 max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl" id="modal-content">
+    <div id="modal-filtro"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl p-8 max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl"
+            id="modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-black dark:text-white" id="modal-title">Configurar Radar</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form id="form-filtro" class="space-y-6">
@@ -209,58 +273,97 @@
 
                 <div class="grid grid-cols-2 gap-5">
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Tipo de Busca</label>
-                        <select id="f-tipo" onchange="atualizarScrapers()" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Tipo
+                            de Busca</label>
+                        <select id="f-tipo" onchange="atualizarScrapers()"
+                            class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
                             <option value="Vagas">Setor Privado (Vagas CLT/PJ)</option>
                             <option value="Concursos">Setor Público (Concursos)</option>
                         </select>
                     </div>
 
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Nome do Radar</label>
-                        <input type="text" id="f-nome" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: Desenvolvedor Backend Python" required>
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Nome
+                            do Radar</label>
+                        <input type="text" id="f-nome"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors"
+                            placeholder="Ex: Desenvolvedor Backend Python" required>
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Termos (Exatos)</label>
-                        <input type="text" id="f-termos" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: java, python, qa" required>
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Termos</label>
+                        <input type="text" id="f-termos"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors"
+                            placeholder="Ex: java, python, qa" required>
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i class="fa-solid fa-ban text-red-400"></i> Palavras Proibidas</label>
-                        <input type="text" id="f-proibidas" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-red-400 transition-colors" placeholder="Ex: sênior, pleno">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i
+                                class="fa-solid fa-ban text-red-400"></i> Palavras Proibidas</label>
+                        <input type="text" id="f-proibidas"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-red-400 transition-colors"
+                            placeholder="Ex: sênior, pleno">
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Localização</label>
-                        <input type="text" id="f-local" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: Remoto, Brasil, SP">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Localização</label>
+                        <input type="text" id="f-local"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors"
+                            placeholder="Ex: Remoto, Brasil, SP">
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Data Limite da Vaga</label>
-                        <input type="date" id="f-data-max" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors cursor-pointer" required>
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Data
+                            Limite para Busca</label>
+                        <input type="date" id="f-data-max"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors cursor-pointer"
+                            required>
                     </div>
 
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wider uppercase">Motores de Busca</label>
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wider uppercase">Sites
+                            de Busca</label>
                         <div id="lista-scrapers" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
                     </div>
 
-                    <div class="col-span-2 bg-brand/5 border border-brand/20 p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 mt-2">
+                    <div
+                        class="col-span-2 bg-brand/5 border border-brand/20 p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 mt-2">
                         <div>
-                            <p class="font-bold text-brand flex items-center gap-2"><i class="fa-solid fa-stopwatch"></i> Automação do Radar</p>
+                            <p class="font-bold text-brand flex items-center gap-2"><i
+                                    class="fa-solid fa-stopwatch"></i> Automação do Radar</p>
                             <p class="text-xs text-slate-500 mt-1">Busca automática a cada X minutos.</p>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl">
-                                <input type="number" id="f-intervalo" min="5" value="60" class="w-16 bg-transparent text-sm font-bold dark:text-white outline-none text-center">
-                                <span class="text-xs font-semibold text-slate-400">MIN</span>
+                            <div
+                                class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl w-36">
+                                <select id="f-intervalo"
+                                    class="bg-transparent text-sm font-bold dark:text-white outline-none cursor-pointer w-full text-center">
+                                    <option value="5" class="text-slate-800">5 Minutos</option>
+                                    <option value="10" class="text-slate-800">10 Minutos</option>
+                                    <option value="15" class="text-slate-800">15 Minutos</option>
+                                    <option value="30" class="text-slate-800">30 Minutos</option>
+                                    <option value="60" class="text-slate-800" selected>1 Hora</option>
+                                    <option value="120" class="text-slate-800">2 Horas</option>
+                                    <option value="240" class="text-slate-800">4 Horas</option>
+                                    <option value="360" class="text-slate-800">6 Horas</option>
+                                    <option value="480" class="text-slate-800">8 Horas</option>
+                                    <option value="720" class="text-slate-800">12 Horas</option>
+                                    <option value="1440" class="text-slate-800">24 Horas</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-slate-800 dark:bg-brand hover:bg-slate-900 dark:hover:bg-brandHover text-white font-bold py-4 rounded-xl mt-6 transition-all shadow-lg shadow-brand/20 active:scale-[0.98]">
+                <button type="submit"
+                    class="w-full bg-slate-800 dark:bg-brand hover:bg-slate-900 dark:hover:bg-brandHover text-white font-bold py-4 rounded-xl mt-6 transition-all shadow-lg shadow-brand/20 active:scale-[0.98]">
                     <i class="fa-solid fa-floppy-disk mr-2"></i> Salvar Radar
                 </button>
             </form>
@@ -268,15 +371,15 @@
     </div>
 
     <script>
-        const scrapersVagas = ["Empregos", "InfoJobs", "Gupy", "LinkedIn", "Indeed", "Programathor", "Remotar"];
-        const scrapersConcursos = ["PCI", "C_Brasil", "Gran", "Folha_QC"];
+        const scrapersVagas = ["Empregos", "InfoJobs", "Gupy", "LinkedIn", "Solides", "Programathor", "Remotar"];
+        const scrapersConcursos = ["PCI Concursos", "Concursos Brasil", "Gran Concursos", "Folha QC"];
         let filtrosAtuais = [];
         let resultadosGlobais = [];
         let subAbaAtual = 'radar';
         let radarAtivoId = null;
-        let toastTimeout; 
+        let toastTimeout;
 
-        if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
@@ -306,12 +409,12 @@
                 const res = await fetch('/api/usuario/config');
                 const cfg = await res.json();
                 const select = document.getElementById('cfg-limpeza');
-                if(cfg.ativa) { select.value = cfg.meses.toString(); } 
+                if (cfg.ativa) { select.value = cfg.meses.toString(); }
                 else { select.value = "0"; }
-                
+
                 document.getElementById('modal-config').classList.remove('opacity-0', 'pointer-events-none');
                 document.getElementById('modal-config-content').classList.remove('scale-95');
-            } catch(e) { showToast("Erro ao ler configurações."); }
+            } catch (e) { showToast("Erro ao ler configurações."); }
         }
 
         function fecharConfiguracoes() {
@@ -328,12 +431,12 @@
             };
             try {
                 const res = await fetch('/api/usuario/config', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 showToast(data.mensagem || "Salvo com sucesso!");
                 fecharConfiguracoes();
-            } catch(e) { showToast("Erro ao salvar."); }
+            } catch (e) { showToast("Erro ao salvar."); }
         });
 
         // --- LÓGICA DOS RADARES ---
@@ -361,7 +464,7 @@
         function openModal() {
             document.getElementById('f-id').value = '';
             document.getElementById('form-filtro').reset();
-            setDateTo30DaysAgo(); 
+            setDateTo30DaysAgo();
             document.getElementById('modal-title').innerText = "Criar Novo Radar";
             document.getElementById('f-intervalo').value = "60";
             atualizarScrapers();
@@ -408,7 +511,7 @@
 
                     const isVaga = f.tipo_busca === 'Vagas';
                     const tagColor = isVaga ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/40 dark:text-fuchsia-300';
-                    
+
                     let limiteDate = new Date();
                     limiteDate.setDate(limiteDate.getDate() - diasMax);
                     let limiteStr = limiteDate.toLocaleDateString('pt-BR');
@@ -418,7 +521,7 @@
                         const dataObj = new Date(f.ultima_varredura);
                         ultimaVarreduraTexto = dataObj.toLocaleDateString('pt-BR') + ' às ' + dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
                     }
-                    
+
                     const listArr = scrapersStr.split(',');
                     const scrapersLimitados = listArr.slice(0, 3).join(', ') + (listArr.length > 3 ? '...' : '');
 
@@ -456,7 +559,7 @@
                         </button>
                     </div>`;
                 });
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function editarFiltro(id) {
@@ -469,11 +572,11 @@
             document.getElementById('f-termos').value = f.termos;
             document.getElementById('f-local').value = f.localizacao;
             document.getElementById('f-proibidas').value = f.palavras_proibidas;
-            
+
             let d = new Date();
             d.setDate(d.getDate() - (f.max_dias || 30));
             document.getElementById('f-data-max').value = d.toISOString().split('T')[0];
-            
+
             document.getElementById('f-intervalo').value = f.intervalo_timer;
             atualizarScrapers((f.scrapers || '').split(','));
             document.getElementById('modal-filtro').classList.remove('opacity-0', 'pointer-events-none');
@@ -500,7 +603,7 @@
                 formato: "Padrão",
                 scrapers: scrapers.join(','),
                 max_dias: diasCalculados,
-                timer_ativo: false, 
+                timer_ativo: false,
                 intervalo_timer: parseInt(document.getElementById('f-intervalo').value)
             };
 
@@ -536,7 +639,7 @@
         function parseDataReal(dataStr) {
             if (!dataStr) return new Date(2000, 0, 1);
             let s = dataStr.toLowerCase();
-            let hoje = new Date(); 
+            let hoje = new Date();
             if (s.includes('hoje') || s.includes('recente') || s.includes('agora') || s.includes('hora') || s.includes('minuto')) return hoje;
             if (s.includes('ontem')) { hoje.setDate(hoje.getDate() - 1); return hoje; }
 
@@ -571,7 +674,7 @@
 
             const selectScraper = document.getElementById('filtro-scraper');
             let opcoesHtml = '<option value="todos">Qualquer Site</option>';
-            if (aba === 'vagas') { scrapersVagas.forEach(s => { opcoesHtml += `<option value="${s}">${s}</option>`; }); } 
+            if (aba === 'vagas') { scrapersVagas.forEach(s => { opcoesHtml += `<option value="${s}">${s}</option>`; }); }
             else if (aba === 'concursos') { scrapersConcursos.forEach(s => { opcoesHtml += `<option value="${s}">${s}</option>`; }); }
             selectScraper.innerHTML = opcoesHtml;
             renderizarResultados();
@@ -582,7 +685,7 @@
                 const res = await fetch('/api/resultados');
                 resultadosGlobais = await res.json();
                 renderizarResultados();
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function filtrarResultadosLocais() { renderizarResultados(); }
@@ -593,6 +696,13 @@
                     const res = await fetch(`/api/filtros/${id}/vagas`, { method: 'DELETE' });
                     if(res.ok) {
                         showToast("Vagas limpas com sucesso!");
+                        
+                        // --- O AJUSTE ESTÁ AQUI ---
+                        // Tiramos o usuário de dentro do radar e escondemos a barra de filtros
+                        radarAtivoId = null;
+                        document.getElementById('barra-filtros-locais').style.display = 'none';
+                        
+                        // Baixa os dados atualizados do servidor e renderiza a grade principal de volta
                         await carregarResultados(); 
                     } else { showToast("Erro ao limpar vagas."); }
                 } catch(e) {}
@@ -603,31 +713,38 @@
             if (confirm("Tem certeza que deseja excluir esta oportunidade?")) {
                 try {
                     const res = await fetch(`/api/resultados/${id}`, { method: 'DELETE' });
-                    if(res.ok) {
+                    if (res.ok) {
                         showToast("Vaga excluída!");
                         resultadosGlobais = resultadosGlobais.filter(v => v.id !== id);
-                        renderizarResultados(); 
+                        renderizarResultados();
                     } else { showToast("Erro ao excluir."); }
-                } catch(e) {}
+                } catch (e) { }
             }
         }
 
         function renderizarResultados() {
             const area = document.getElementById('area-resultados');
-            if (!resultadosGlobais || resultadosGlobais.length === 0) {
-                area.innerHTML = `
-                <div class="text-center py-20 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 mt-8">
-                    <i class="fa-solid fa-box-open text-5xl mb-4 text-slate-300 dark:text-slate-600"></i>
-                    <h3 class="text-xl font-bold dark:text-white mb-2">Cofre Vazio</h3>
-                    <p class="text-slate-500 dark:text-slate-400">Rode um radar para preencher seus resultados.</p>
-                </div>`;
-                return;
-            }
-
+            
+            // 1. VISÃO GERAL DE RADARES (Mostra os cartões SEMPRE, independente de ter vagas salvas ou não)
             if (subAbaAtual === 'radar' && radarAtivoId === null) {
+                if (!filtrosAtuais || filtrosAtuais.length === 0) {
+                    area.innerHTML = `
+                    <div class="text-center py-20 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 mt-8">
+                        <i class="fa-solid fa-satellite-dish text-5xl mb-4 text-slate-300 dark:text-slate-600"></i>
+                        <h3 class="text-xl font-bold dark:text-white mb-2">Nenhum Radar Criado</h3>
+                        <p class="text-slate-500 dark:text-slate-400">Vá na aba 'Meus Radares' e crie o seu primeiro radar.</p>
+                    </div>`;
+                    return;
+                }
+
                 let grupos = {};
+                // Cria todos os cards primeiro, partindo de 0 resultados
                 filtrosAtuais.forEach(f => { grupos[f.id] = { nome: f.nome_filtro || 'Sem Nome', tipo: f.tipo_busca, qtd: 0 }; });
-                resultadosGlobais.forEach(v => { if (v.filtro_id && grupos[v.filtro_id]) grupos[v.filtro_id].qtd++; });
+                
+                // Se houver vagas globais, faz a contagem e adiciona ao card correto
+                if (resultadosGlobais && resultadosGlobais.length > 0) {
+                    resultadosGlobais.forEach(v => { if (v.filtro_id && grupos[v.filtro_id]) grupos[v.filtro_id].qtd++; });
+                }
 
                 let htmlGrid = '<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-4">';
                 for (const id in grupos) {
@@ -648,6 +765,18 @@
                 return;
             }
 
+            // 2. VISÃO DE VAGAS, CONCURSOS OU DENTRO DE UM RADAR ESPECÍFICO (Aqui sim, barramos se não tiver resultados)
+            if (!resultadosGlobais || resultadosGlobais.length === 0) {
+                area.innerHTML = `
+                <div class="text-center py-20 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 mt-8">
+                    <i class="fa-solid fa-box-open text-5xl mb-4 text-slate-300 dark:text-slate-600"></i>
+                    <h3 class="text-xl font-bold dark:text-white mb-2">Cofre Vazio</h3>
+                    <p class="text-slate-500 dark:text-slate-400">Rode um radar para preencher seus resultados.</p>
+                </div>`;
+                return;
+            }
+
+            // 3. LÓGICA DE LISTAGEM E FILTRAGEM DE CARDS INDIVIDUAIS
             let listaFiltrada = [];
             let tituloPagina = "";
             let dataLimiteRadar = null;
@@ -711,7 +840,7 @@
             const radar = filtrosAtuais.find(f => f.id === id);
             const selectScraper = document.getElementById('filtro-scraper');
             let opcoesHtml = '<option value="todos">Todos Sites do Radar</option>';
-            if(radar && radar.scrapers) {
+            if (radar && radar.scrapers) {
                 radar.scrapers.split(',').forEach(site => { opcoesHtml += `<option value="${site.trim()}">${site.trim()}</option>`; });
             }
             selectScraper.innerHTML = opcoesHtml;
@@ -726,7 +855,11 @@
 
         function gerarGridDeCards(lista) {
             return `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">` +
-                lista.map(v => `
+                lista.map(v => {
+                    // A MÁGICA AQUI: Lê o seu array com os 4 sites e define o texto do botão
+                    const textoBotao = scrapersConcursos.includes(v.scraper) ? 'Ver Concurso' : 'Ver Vaga';
+
+                    return `
                 <div class="bg-white dark:bg-darkCard rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm relative group flex flex-col h-full hover:shadow-xl hover:-translate-y-1 hover:border-brand/50 transition-all duration-300">
                     <div class="flex justify-between items-start gap-3 mb-3 w-full overflow-hidden">
                         <span class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 min-w-0" title="${v.empresa || 'Confidencial'}">
@@ -737,13 +870,13 @@
                             <span class="text-[10px] font-black bg-brand/10 text-brand px-2 py-1 rounded-md uppercase tracking-wide border border-brand/20 shadow-sm truncate max-w-[80px]" title="${v.scraper || 'Site'}">
                                 ${v.scraper || 'Site'}
                             </span>
-                            <button onclick="deletarVagaIndividual(${v.id})" class="w-6 h-6 flex justify-center items-center rounded-md bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-slate-700 transition-all opacity-0 group-hover:opacity-100" title="Excluir esta vaga">
+                            <button onclick="deletarVagaIndividual(${v.id})" class="w-6 h-6 flex justify-center items-center rounded-md bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 border border-slate-200 dark:border-slate-700 transition-all opacity-0 group-hover:opacity-100" title="Excluir esta oportunidade">
                                 <i class="fa-solid fa-trash text-xs"></i>
                             </button>
                         </div>
                     </div>
-                    <h4 class="text-lg font-black dark:text-white mb-4 leading-snug group-hover:text-brand transition-colors line-clamp-2" title="${v.titulo || 'Vaga'}">
-                        ${v.titulo || 'Vaga'}
+                    <h4 class="text-lg font-black dark:text-white mb-4 leading-snug group-hover:text-brand transition-colors line-clamp-2" title="${v.titulo || 'Oportunidade'}">
+                        ${v.titulo || 'Oportunidade'}
                     </h4>
                     <div class="flex flex-wrap gap-2 mb-6 mt-auto">
                         <span class="flex items-center gap-1.5 text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-lg border border-slate-100 dark:border-slate-700/50 min-w-0 max-w-full" title="${v.local || 'N/A'}">
@@ -754,13 +887,14 @@
                         </span>
                     </div>
                     <a href="${v.link || '#'}" target="_blank" rel="noopener noreferrer" class="w-full flex justify-center items-center gap-2 text-sm font-black text-white bg-slate-800 hover:bg-slate-900 dark:bg-brand dark:hover:bg-brandHover py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98]">
-                        Ver Vaga <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70"></i>
+                        ${textoBotao} <i class="fa-solid fa-arrow-up-right-from-square text-xs ml-1 opacity-70"></i>
                     </a>
                 </div>
-            `).join('') + `</div>`;
+                `}).join('') + `</div>`;
         }
-        
+
         carregarFiltros();
     </script>
 </body>
+
 </html>
