@@ -131,13 +131,21 @@
     <main class="flex-1 h-full overflow-y-auto p-8 relative">
 
         <!-- CARREGANDO -->
-        <div id="loader-overlay"
-            class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
-            <div
-                class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700">
-                <i class="fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4"></i>
-                <h2 class="text-xl font-black dark:text-white">Varrendo os Sites...</h2>
-                <p class="text-slate-500 text-sm mt-2">Isso pode levar alguns segundos.</p>
+        <div id="loader-overlay" class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
+            <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700 w-full max-w-sm text-center relative transition-all">
+                <i id="loader-icon" class="fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4"></i>
+                <h2 id="loader-title" class="text-xl font-black dark:text-white">Varrendo os Sites...</h2>
+                <p id="loader-text" class="text-slate-500 text-sm mt-2">Isso pode levar alguns minutos.</p>
+
+                <!-- Ações do Loader -->
+                <div id="loader-actions" class="mt-8 flex flex-col gap-3 w-full">
+                    <button onclick="ocultarLoaderSegundoPlano()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-down-left-and-up-right-to-center"></i> Rodar em Segundo Plano
+                    </button>
+                    <button onclick="cancelarVarreduraFrontend()" class="w-full bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-xmark"></i> Cancelar Varredura
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -622,18 +630,110 @@
             }
         }
 
+        let controllerVarredura = null;
+        let varreduraEmSegundoPlano = false;
+
         async function rodarFiltro(id) {
-            document.getElementById('loader-overlay').classList.remove('hidden');
-            document.getElementById('loader-overlay').classList.add('flex');
+            varreduraEmSegundoPlano = false;
+            controllerVarredura = new AbortController(); // Permite cancelar o fetch
+
+            const overlay = document.getElementById('loader-overlay');
+            const icon = document.getElementById('loader-icon');
+            const title = document.getElementById('loader-title');
+            const text = document.getElementById('loader-text');
+            const actions = document.getElementById('loader-actions');
+
+            // 1. Reseta o visual para o padrão de carregamento
+            icon.className = "fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4";
+            title.innerText = "Varrendo os Sites...";
+            title.className = "text-xl font-black dark:text-white";
+            text.innerText = "Isso pode levar alguns minutos.";
+            actions.classList.remove('hidden');
+            
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
             try {
-                const res = await fetch(`/api/filtros/${id}/rodar`, { method: 'POST' });
+                // Envia a requisição atrelando o controle de cancelamento (AbortController)
+                const res = await fetch(`/api/filtros/${id}/rodar`, { 
+                    method: 'POST',
+                    signal: controllerVarredura.signal
+                });
+                
+                if (!res.ok) throw new Error("Erro_Servidor");
+                
                 const data = await res.json();
-                showToast(data.mensagem);
-                changeTab('resultados');
-                carregarResultados();
-            } catch (e) { showToast("Erro na conexão com o robô."); }
-            document.getElementById('loader-overlay').classList.add('hidden');
-            document.getElementById('loader-overlay').classList.remove('flex');
+                
+                // Se o usuário ocultou a tela, disparamos o toast e carregamos o fundo
+                if (varreduraEmSegundoPlano) {
+                    showToast("✅ Varredura em segundo plano finalizada!");
+                    carregarResultados();
+                    return;
+                }
+
+                // 2. Feedback visual de Sucesso na Tela
+                actions.classList.add('hidden');
+                icon.className = "fa-solid fa-circle-check text-5xl text-brand mb-4";
+                title.innerText = "Varredura Concluída!";
+                title.className = "text-xl font-black text-brand";
+                text.innerText = "Tudo certo! Redirecionando para as oportunidades...";
+
+                await carregarResultados();
+
+                // Espera 2 segundos para o usuário ler a mensagem de sucesso e redireciona
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                    changeTab('resultados');
+                }, 2000);
+
+            } catch (e) { 
+                // 3. Verifica se o erro foi provocado pelo clique em Cancelar
+                if (e.name === 'AbortError') {
+                    if (!varreduraEmSegundoPlano) {
+                        actions.classList.add('hidden');
+                        icon.className = "fa-solid fa-ban text-5xl text-amber-500 mb-4";
+                        title.innerText = "Varredura Cancelada";
+                        title.className = "text-xl font-black text-amber-500";
+                        text.innerText = "A conexão com o robô foi abortada.";
+                        
+                        setTimeout(() => {
+                            overlay.classList.add('hidden');
+                            overlay.classList.remove('flex');
+                        }, 2000);
+                    }
+                } else {
+                    // 4. Feedback visual de Erro real (ex: Timeout do Nginx ou backend fora do ar)
+                    if (varreduraEmSegundoPlano) {
+                        showToast("❌ Houve um erro na varredura em segundo plano.");
+                    } else {
+                        actions.classList.add('hidden');
+                        icon.className = "fa-solid fa-triangle-exclamation text-5xl text-red-500 mb-4";
+                        title.innerText = "Erro na Varredura";
+                        title.className = "text-xl font-black text-red-500";
+                        text.innerText = "Houve um problema de conexão. Tente novamente.";
+                        
+                        setTimeout(() => {
+                            overlay.classList.add('hidden');
+                            overlay.classList.remove('flex');
+                        }, 3000);
+                    }
+                }
+            }
+        }
+
+        function ocultarLoaderSegundoPlano() {
+            varreduraEmSegundoPlano = true;
+            const overlay = document.getElementById('loader-overlay');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+            showToast("Varredura rodando em segundo plano. Avisaremos quando terminar!");
+        }
+
+        function cancelarVarreduraFrontend() {
+            if (controllerVarredura) {
+                controllerVarredura.abort(); // Dispara o 'AbortError' na requisição fetch
+            }
         }
 
         function parseDataReal(dataStr) {
