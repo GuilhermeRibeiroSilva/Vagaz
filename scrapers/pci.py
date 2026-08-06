@@ -76,150 +76,153 @@ def buscar_concursos_pci(termo: str, max_paginas: int = 4, headless: bool = True
 
         # Se for uma região ou nacional, não existe paginação. Tudo fica na página 1.
         paginas_a_buscar = 1 if is_categoria else max_paginas
-
-        for pagina in range(1, paginas_a_buscar + 1):
-            if is_categoria:
-                url = url_base
-            else:
-                url = url_base if pagina == 1 else f"{url_base}/{pagina}"
-            
-            print(f"🤖 [PCI Concursos - Pág {pagina}] Acessando: {url}")
-            
-            try:
-                page.goto(url, wait_until="domcontentloaded", timeout=40000)
-                page.evaluate("window.stop();") # Trava anúncios chatos
-                page.wait_for_timeout(1000)
+        
+        try:
+            for pagina in range(1, paginas_a_buscar + 1):
+                if is_categoria:
+                    url = url_base
+                else:
+                    url = url_base if pagina == 1 else f"{url_base}/{pagina}"
                 
-                for _ in range(2):
-                    page.evaluate("window.scrollBy(0, 800);")
-                    page.wait_for_timeout(500)
+                print(f"🤖 [PCI Concursos - Pág {pagina}] Acessando: {url}")
                 
-                # O CÓDIGO JAVASCRIPT AGORA RECEBE A "SIGLA ALVO" DO PYTHON
-                js_extrator = r"""
-                (async function() {
-                    var siglaAlvo = "__SIGLA_ALVO__";
-                    var cards = document.querySelectorAll('div.ca, div.na');
+                try:
+                    page.goto(url, wait_until="domcontentloaded", timeout=40000)
+                    page.evaluate("window.stop();") # Trava anúncios chatos
+                    page.wait_for_timeout(1000)
                     
-                    var promises = Array.from(cards).map(async (el) => {
-                        try {
-                            var aTag = el.querySelector('a');
-                            if (!aTag) return null;
-                            
-                            var localTag = el.querySelector('div.cc');
-                            var localStr = localTag ? localTag.innerText.trim() : 'Brasil';
-                            
-                            // SE FOR BUSCA POR ESTADO, IGNORA OS OUTROS ESTADOS DA MESMA REGIÃO
-                            if (siglaAlvo !== "" && localStr.toUpperCase() !== siglaAlvo) {
-                                return null;
-                            }
-                            
-                            var orgao = aTag.innerText.trim(); 
-                            var descricao = aTag.getAttribute('title') || ''; 
-                            if (orgao.length < 2) return null;
-                            
-                            var empresa = orgao;
-                            if (empresa.length > 40) empresa = empresa.substring(0, 37) + "...";
-
-                            var tituloCompleto = descricao ? descricao : orgao;
-                            if (descricao && !tituloCompleto.toLowerCase().includes(orgao.toLowerCase())) {
-                                tituloCompleto = orgao + " - " + descricao;
-                            }
-
-                            var href = aTag.getAttribute('href') || '';
-                            if (href && href.startsWith('/')) href = 'https://www.pciconcursos.com.br' + href;
-
-                            // LENDO O PRAZO FINAL
-                            var dataTag = el.querySelector('div.ce');
-                            var prazoStr = dataTag ? dataTag.innerText.trim() : '';
-                            var isExpired = false;
-
-                            if (prazoStr) {
-                                var m = prazoStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-                                var today = new Date();
-                                today.setHours(0,0,0,0);
-                                
-                                if (m) {
-                                    var dDate = new Date(m[3], m[2]-1, m[1]);
-                                    if (dDate < today) isExpired = true;
-                                } else {
-                                    var m2 = prazoStr.match(/(\d{2})\/(\d{2})/);
-                                    if (m2) {
-                                        var dDate2 = new Date(today.getFullYear(), m2[2]-1, m2[1]);
-                                        if (dDate2 < today && (today.getMonth() - dDate2.getMonth() > 2)) {
-                                            isExpired = true;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (isExpired) return null; 
-
-                            if (prazoStr) {
-                                tituloCompleto = tituloCompleto + " [Prazo: " + prazoStr + "]";
-                            }
-
-                            // FETCH INVISÍVEL PARA PEGAR A DATA REAL DA PUBLICAÇÃO
-                            var dataPublicacao = 'Recente';
+                    for _ in range(2):
+                        page.evaluate("window.scrollBy(0, 800);")
+                        page.wait_for_timeout(500)
+                    
+                    # O CÓDIGO JAVASCRIPT AGORA RECEBE A "SIGLA ALVO" DO PYTHON
+                    js_extrator = r"""
+                    (async function() {
+                        var siglaAlvo = "__SIGLA_ALVO__";
+                        var cards = document.querySelectorAll('div.ca, div.na');
+                        
+                        var promises = Array.from(cards).map(async (el) => {
                             try {
-                                var resp = await fetch(href, { signal: AbortSignal.timeout(4000) });
-                                var html = await resp.text();
+                                var aTag = el.querySelector('a');
+                                if (!aTag) return null;
                                 
-                                var matchAbbr = html.match(/<abbr[^>]*class=["']published["'][^>]*>([^<]+)<\/abbr>/i);
-                                if (matchAbbr) {
-                                    var dataExtensa = matchAbbr[1].toLowerCase();
-                                    var meses = {"janeiro":"01","fevereiro":"02","março":"03","abril":"04","maio":"05","junho":"06","julho":"07","agosto":"08","setembro":"09","outubro":"10","novembro":"11","dezembro":"12"};
+                                var localTag = el.querySelector('div.cc');
+                                var localStr = localTag ? localTag.innerText.trim() : 'Brasil';
+                                
+                                // SE FOR BUSCA POR ESTADO, IGNORA OS OUTROS ESTADOS DA MESMA REGIÃO
+                                if (siglaAlvo !== "" && localStr.toUpperCase() !== siglaAlvo) {
+                                    return null;
+                                }
+                                
+                                var orgao = aTag.innerText.trim(); 
+                                var descricao = aTag.getAttribute('title') || ''; 
+                                if (orgao.length < 2) return null;
+                                
+                                var empresa = orgao;
+                                if (empresa.length > 40) empresa = empresa.substring(0, 37) + "...";
+
+                                var tituloCompleto = descricao ? descricao : orgao;
+                                if (descricao && !tituloCompleto.toLowerCase().includes(orgao.toLowerCase())) {
+                                    tituloCompleto = orgao + " - " + descricao;
+                                }
+
+                                var href = aTag.getAttribute('href') || '';
+                                if (href && href.startsWith('/')) href = 'https://www.pciconcursos.com.br' + href;
+
+                                // LENDO O PRAZO FINAL
+                                var dataTag = el.querySelector('div.ce');
+                                var prazoStr = dataTag ? dataTag.innerText.trim() : '';
+                                var isExpired = false;
+
+                                if (prazoStr) {
+                                    var m = prazoStr.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+                                    var today = new Date();
+                                    today.setHours(0,0,0,0);
                                     
-                                    for (var mes in meses) {
-                                        if (dataExtensa.includes(mes)) {
-                                            var diaMatch = dataExtensa.match(/(\d{1,2})\s+de/);
-                                            var anoMatch = dataExtensa.match(/20\d{2}/);
-                                            if (diaMatch && anoMatch) {
-                                                var dia = diaMatch[1].padStart(2, '0');
-                                                dataPublicacao = dia + "/" + meses[mes] + "/" + anoMatch[0];
+                                    if (m) {
+                                        var dDate = new Date(m[3], m[2]-1, m[1]);
+                                        if (dDate < today) isExpired = true;
+                                    } else {
+                                        var m2 = prazoStr.match(/(\d{2})\/(\d{2})/);
+                                        if (m2) {
+                                            var dDate2 = new Date(today.getFullYear(), m2[2]-1, m2[1]);
+                                            if (dDate2 < today && (today.getMonth() - dDate2.getMonth() > 2)) {
+                                                isExpired = true;
                                             }
-                                            break;
                                         }
                                     }
                                 }
-                            } catch(e) {} 
 
-                            return [tituloCompleto, href, empresa, localStr, dataPublicacao].join('|||');
-                        } catch(err) { return null; }
-                    });
+                                if (isExpired) return null; 
+
+                                if (prazoStr) {
+                                    tituloCompleto = tituloCompleto + " [Prazo: " + prazoStr + "]";
+                                }
+
+                                // FETCH INVISÍVEL PARA PEGAR A DATA REAL DA PUBLICAÇÃO
+                                var dataPublicacao = 'Recente';
+                                try {
+                                    var resp = await fetch(href, { signal: AbortSignal.timeout(4000) });
+                                    var html = await resp.text();
+                                    
+                                    var matchAbbr = html.match(/<abbr[^>]*class=["']published["'][^>]*>([^<]+)<\/abbr>/i);
+                                    if (matchAbbr) {
+                                        var dataExtensa = matchAbbr[1].toLowerCase();
+                                        var meses = {"janeiro":"01","fevereiro":"02","março":"03","abril":"04","maio":"05","junho":"06","julho":"07","agosto":"08","setembro":"09","outubro":"10","novembro":"11","dezembro":"12"};
+                                        
+                                        for (var mes in meses) {
+                                            if (dataExtensa.includes(mes)) {
+                                                var diaMatch = dataExtensa.match(/(\d{1,2})\s+de/);
+                                                var anoMatch = dataExtensa.match(/20\d{2}/);
+                                                if (diaMatch && anoMatch) {
+                                                    var dia = diaMatch[1].padStart(2, '0');
+                                                    dataPublicacao = dia + "/" + meses[mes] + "/" + anoMatch[0];
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                } catch(e) {} 
+
+                                return [tituloCompleto, href, empresa, localStr, dataPublicacao].join('|||');
+                            } catch(err) { return null; }
+                        });
+                        
+                        var results = await Promise.all(promises);
+                        return results.filter(r => r !== null);
+                    })();
+                    """
                     
-                    var results = await Promise.all(promises);
-                    return results.filter(r => r !== null);
-                })();
-                """
-                
-                # Injeta a sigla alvo de forma segura no script
-                js_extrator = js_extrator.replace("__SIGLA_ALVO__", sigla_alvo)
-                
-                vagas_desta_pagina = page.evaluate(js_extrator)
-                
-                if not vagas_desta_pagina:
-                    print(f"⚠️ [PCI] Nenhum concurso válido encontrado na pág {pagina}.")
-                    break
-                
-                novos_concursos = 0
-                for vaga_str in vagas_desta_pagina:
-                    link_da_vaga = vaga_str.split('|||')[1]
+                    # Injeta a sigla alvo de forma segura no script
+                    js_extrator = js_extrator.replace("__SIGLA_ALVO__", sigla_alvo)
                     
-                    if link_da_vaga not in links_capturados:
-                        links_capturados.add(link_da_vaga)
-                        vagas_brutas_totais.add(vaga_str)
-                        novos_concursos += 1
-                
-                if novos_concursos == 0:
+                    vagas_desta_pagina = page.evaluate(js_extrator)
+                    
+                    if not vagas_desta_pagina:
+                        print(f"⚠️ [PCI] Nenhum concurso válido encontrado na pág {pagina}.")
+                        break
+                    
+                    novos_concursos = 0
+                    for vaga_str in vagas_desta_pagina:
+                        link_da_vaga = vaga_str.split('|||')[1]
+                        
+                        if link_da_vaga not in links_capturados:
+                            links_capturados.add(link_da_vaga)
+                            vagas_brutas_totais.add(vaga_str)
+                            novos_concursos += 1
+                    
+                    if novos_concursos == 0:
+                        break
+
+                    print(f"✅ [PCI] {novos_concursos} editais mapeados na pág {pagina}.")
+
+                except Exception as e:
+                    print(f"❌ Erro na pág {pagina}: {e}")
                     break
 
-                print(f"✅ [PCI] {novos_concursos} editais mapeados na pág {pagina}.")
-
-            except Exception as e:
-                print(f"❌ Erro na pág {pagina}: {e}")
-                break
-            
-        browser.close()
+        finally:
+            page.close()
+            browser.close()
         
         print(f"📊 RELATÓRIO FINAL: {len(vagas_brutas_totais)} concursos extraídos do PCI.")
         

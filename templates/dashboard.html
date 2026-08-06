@@ -149,6 +149,17 @@
             </div>
         </div>
 
+        <!-- WIDGET SEGUNDO PLANO (MINIMIZADO) -->
+        <div id="widget-segundo-plano" class="fixed bottom-6 right-6 bg-white dark:bg-darkCard shadow-2xl border border-brand/50 rounded-2xl p-4 w-80 z-50 hidden transform transition-all cursor-pointer hover:scale-105 group" onclick="maximizarLoader()">
+            <div class="flex items-center gap-4">
+                <i class="fa-solid fa-satellite-dish fa-spin text-brand text-3xl"></i>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 group-hover:text-brand transition-colors">Varredura Ativa <i class="fa-solid fa-expand ml-1"></i></p>
+                    <p id="widget-status" class="text-sm font-bold text-slate-700 dark:text-white truncate">Calculando...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- ABA RADARES -->
         <section id="tab-filtros" class="tab-content active max-w-6xl mx-auto">
             <div class="flex justify-between items-center mb-8">
@@ -632,91 +643,109 @@
 
         let controllerVarredura = null;
         let varreduraEmSegundoPlano = false;
+        let radarAtivoLoop = null; // Guarda o ID do radar rodando
+        let statusInterval = null; // O relógio do Polling
 
         async function rodarFiltro(id) {
+            radarAtivoLoop = id;
             varreduraEmSegundoPlano = false;
-            controllerVarredura = new AbortController(); // Permite cancelar o fetch
+            controllerVarredura = new AbortController();
 
             const overlay = document.getElementById('loader-overlay');
             const icon = document.getElementById('loader-icon');
             const title = document.getElementById('loader-title');
             const text = document.getElementById('loader-text');
             const actions = document.getElementById('loader-actions');
+            const widget = document.getElementById('widget-segundo-plano');
 
-            // 1. Reseta o visual para o padrão de carregamento
+            // 1. Reseta o Visual
+            widget.classList.add('hidden');
             icon.className = "fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4";
-            title.innerText = "Varrendo os Sites...";
+            title.innerText = "Iniciando Motores...";
             title.className = "text-xl font-black dark:text-white";
-            text.innerText = "Isso pode levar alguns minutos.";
+            text.innerText = "Conectando ao servidor...";
             actions.classList.remove('hidden');
             
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
 
+            // 2. Inicia o Interfone com o Servidor (Polling a cada 1.5s)
+            statusInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/varredura/${id}/status`);
+                    const data = await res.json();
+                    if(data.etapa) {
+                        text.innerText = data.etapa; // Atualiza a tela cheia
+                        document.getElementById('widget-status').innerText = data.etapa; // Atualiza o widget
+                    }
+                } catch(e) {}
+            }, 1500);
+
             try {
-                // Envia a requisição atrelando o controle de cancelamento (AbortController)
+                // Dispara a requisição oficial
                 const res = await fetch(`/api/filtros/${id}/rodar`, { 
                     method: 'POST',
                     signal: controllerVarredura.signal
                 });
                 
                 if (!res.ok) throw new Error("Erro_Servidor");
-                
                 const data = await res.json();
                 
-                // Se o usuário ocultou a tela, disparamos o toast e carregamos o fundo
+                // Limpa o relógio
+                clearInterval(statusInterval);
+                
                 if (varreduraEmSegundoPlano) {
-                    showToast("✅ Varredura em segundo plano finalizada!");
+                    widget.classList.add('hidden');
+                    showToast(`✅ ${data.mensagem}`);
                     carregarResultados();
                     return;
                 }
 
-                // 2. Feedback visual de Sucesso na Tela
                 actions.classList.add('hidden');
                 icon.className = "fa-solid fa-circle-check text-5xl text-brand mb-4";
-                title.innerText = "Varredura Concluída!";
+                title.innerText = "Concluído!";
                 title.className = "text-xl font-black text-brand";
-                text.innerText = "Tudo certo! Redirecionando para as oportunidades...";
+                text.innerText = data.mensagem;
 
                 await carregarResultados();
 
-                // Espera 2 segundos para o usuário ler a mensagem de sucesso e redireciona
                 setTimeout(() => {
                     overlay.classList.add('hidden');
                     overlay.classList.remove('flex');
                     changeTab('resultados');
-                }, 2000);
+                }, 2500);
 
             } catch (e) { 
-                // 3. Verifica se o erro foi provocado pelo clique em Cancelar
+                clearInterval(statusInterval);
+                
                 if (e.name === 'AbortError') {
                     if (!varreduraEmSegundoPlano) {
                         actions.classList.add('hidden');
                         icon.className = "fa-solid fa-ban text-5xl text-amber-500 mb-4";
-                        title.innerText = "Varredura Cancelada";
+                        title.innerText = "Operação Abortada";
                         title.className = "text-xl font-black text-amber-500";
-                        text.innerText = "A conexão com o robô foi abortada.";
+                        text.innerText = "Você cancelou a busca antes da conclusão.";
                         
                         setTimeout(() => {
                             overlay.classList.add('hidden');
                             overlay.classList.remove('flex');
-                        }, 2000);
+                        }, 2500);
                     }
                 } else {
-                    // 4. Feedback visual de Erro real (ex: Timeout do Nginx ou backend fora do ar)
-                    if (varreduraEmSegundoPlano) {
-                        showToast("❌ Houve um erro na varredura em segundo plano.");
-                    } else {
+                    if (!varreduraEmSegundoPlano) {
                         actions.classList.add('hidden');
                         icon.className = "fa-solid fa-triangle-exclamation text-5xl text-red-500 mb-4";
                         title.innerText = "Erro na Varredura";
                         title.className = "text-xl font-black text-red-500";
-                        text.innerText = "Houve um problema de conexão. Tente novamente.";
+                        text.innerText = "Falha de conexão com o robô. Tente novamente.";
                         
                         setTimeout(() => {
                             overlay.classList.add('hidden');
                             overlay.classList.remove('flex');
                         }, 3000);
+                    } else {
+                        widget.classList.add('hidden');
+                        showToast("❌ Falha na varredura que estava em segundo plano.");
                     }
                 }
             }
@@ -724,16 +753,33 @@
 
         function ocultarLoaderSegundoPlano() {
             varreduraEmSegundoPlano = true;
-            const overlay = document.getElementById('loader-overlay');
-            overlay.classList.add('hidden');
-            overlay.classList.remove('flex');
-            showToast("Varredura rodando em segundo plano. Avisaremos quando terminar!");
+            document.getElementById('loader-overlay').classList.add('hidden');
+            document.getElementById('loader-overlay').classList.remove('flex');
+            
+            // Revela a telinha minimizada incrível
+            document.getElementById('widget-segundo-plano').classList.remove('hidden');
+            
+            showToast("Você está livre! Acompanhe o status no canto inferior da tela.");
         }
 
-        function cancelarVarreduraFrontend() {
-            if (controllerVarredura) {
-                controllerVarredura.abort(); // Dispara o 'AbortError' na requisição fetch
+        function maximizarLoader() {
+            varreduraEmSegundoPlano = false;
+            document.getElementById('widget-segundo-plano').classList.add('hidden');
+            document.getElementById('loader-overlay').classList.remove('hidden');
+            document.getElementById('loader-overlay').classList.add('flex');
+        }
+
+        async function cancelarVarreduraFrontend() {
+            // Avisa o Backend para parar os robôs AGORA
+            if(radarAtivoLoop) {
+                fetch(`/api/varredura/${radarAtivoLoop}/cancelar`, { method: 'POST' }).catch(()=>console.log("Erro ao enviar cancelamento"));
             }
+            
+            // Corta a conexão do Navegador
+            if (controllerVarredura) controllerVarredura.abort(); 
+            
+            // Oculte o widget caso esteja cancelando enquanto minimizado (usando Esc, por exemplo)
+            document.getElementById('widget-segundo-plano').classList.add('hidden');
         }
 
         function parseDataReal(dataStr) {

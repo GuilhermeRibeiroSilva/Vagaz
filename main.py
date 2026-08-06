@@ -245,11 +245,34 @@ def deletar_resultado_individual(vaga_id: int, vagaz_user_id: Optional[str] = Co
 
 scan_lock = asyncio.Lock()
 timers_memoria = {} 
+fila_espera = []
+status_varreduras = {}
+
+@app.get("/api/varredura/{filtro_id}/status")
+def status_varredura(filtro_id: int):
+    # Se ainda está na fila, avisa a posição
+    if filtro_id in fila_espera:
+        pos = fila_espera.index(filtro_id) + 1
+        return {"etapa": f"⏳ Aguardando na fila (Sua posição: {pos})"}
+    # Se já começou, devolve o que o robô está fazendo agora
+    return status_varreduras.get(filtro_id, {"etapa": "Iniciando motor..."})
+
+@app.post("/api/varredura/{filtro_id}/cancelar")
+def cancelar_varredura_real(filtro_id: int):
+    # Avisa o robô que ele deve parar no próximo ciclo
+    if filtro_id in status_varreduras:
+        status_varreduras[filtro_id]["cancelado"] = True
+    # Se ainda estava na fila, tira ele de lá para nem começar
+    if filtro_id in fila_espera:
+        fila_espera.remove(filtro_id)
+    return {"mensagem": "Cancelamento confirmado."}
 
 # ==========================================
 # O MOTOR DE VARREDURA ISOLADO (Com Logs Injetados)
 # ==========================================
 def executar_varredura(filtro_id: int):
+    # Inicializa o status
+    status_varreduras[filtro_id] = {"etapa": "Preparando os robôs invisíveis...", "cancelado": False}
     db = SessionLocal()
     try:
         f_db = db.query(SearchFilter).filter(SearchFilter.id == filtro_id).first()
@@ -261,10 +284,18 @@ def executar_varredura(filtro_id: int):
         scrapers_escolhidos = [s.strip() for s in f_db.scrapers.split(',') if s.strip()]
         palavras_proibidas = [p.strip().lower() for p in f_db.palavras_proibidas.split(',') if p.strip()]
         resultados_totais = []
+        total_sites = len(scrapers_escolhidos)
         
         log_admin(f"Iniciando Radar '{f_db.nome_filtro}' (ID: {filtro_id}). Termos: '{f_db.termos}'.", "SISTEMA")
         
-        for scraper in scrapers_escolhidos:
+        for i, scraper in enumerate(scrapers_escolhidos):
+            # O PULO DO GATO: Se o usuário clicou em cancelar, ele interrompe o loop de sites imediatamente!
+            if status_varreduras.get(filtro_id, {}).get("cancelado"):
+                log_admin(f"🚫 Varredura ID {filtro_id} abortada internamente a pedido do usuário.", "SISTEMA")
+                break
+                
+            status_varreduras[filtro_id]["etapa"] = f"🔎 Vasculhando vagas no {scraper} ({i+1}/{total_sites})..."
+            
             try:
                 # Checa controle individual do scraper
                 cfg_ind = db.query(AppConfig).filter(AppConfig.chave == f"headless_{scraper}").first()
@@ -297,6 +328,8 @@ def executar_varredura(filtro_id: int):
                 
             except Exception as e:
                 log_admin(f"Erro fatal: {e}", scraper)
+
+        status_varreduras[filtro_id]["etapa"] = "💾 Quase lá! Organizando e salvando novas vagas..."
 
         novas_vagas = 0
         links_vistos = set()
@@ -452,11 +485,25 @@ def executar_varredura(filtro_id: int):
 
 
 @app.post("/api/filtros/{filtro_id}/rodar")
-async def rodar_filtro_manual(filtro_id: int, vagaz_user_id: Optional[str] = Cookie(None)):
+async def rodar_filtro_manual(filtro_id: int, request: Request, vagaz_user_id: Optional[str] = Cookie(None)):
+    # 1. Coloca o usuário na fila e avisa no Log
+    fila_espera.append(filtro_id)
+    posicao = len(fila_espera)
+    log_admin(f"🚦 Radar ID {filtro_id} entrou na fila. Posição: {posicao}", "SISTEMA")
+
+    # 2. Fica aguardando o cadeado liberar
     async with scan_lock:
-        log_admin(f"▶️ [Manual] Iniciando Radar ID {filtro_id}...")
+        fila_espera.remove(filtro_id)
+        
+        # 3. O PULO DO GATO: Verifica se o usuário cancelou a requisição no navegador
+        if await request.is_disconnected():
+            log_admin(f"🚫 Varredura ID {filtro_id} abortada! O usuário cancelou antes de chegar a vez dele.", "SISTEMA")
+            return {"mensagem": "Varredura cancelada pelo usuário."}
+
+        log_admin(f"▶️ [Manual] Iniciando Radar ID {filtro_id}...", "SISTEMA")
         novas = await run_in_threadpool(executar_varredura, filtro_id)
-        log_admin(f"✅ [Manual] Finalizado! {novas} encontradas.")
+        log_admin(f"✅ [Manual] Finalizado! {novas} encontradas.", "SISTEMA")
+        
     return {"mensagem": f"Busca concluída! {novas} novas oportunidades."}
 
 @app.on_event("startup")
@@ -503,10 +550,16 @@ async def loop_de_automacao():
             db.close()
             
         for f_id in filtros_para_rodar:
-            print(f"⏰ [Auto] Radar ID {f_id} entrou na fila de varredura.")
+            log_admin(f"⏰ [Auto] Radar ID {f_id} aguardando liberação. (Fila manual: {len(fila_espera)})", "SISTEMA")
+            
             async with scan_lock:
+                # Inteligência de tráfego: O robô automático cede a vez se tiver humanos esperando!
+                if len(fila_espera) > 0:
+                    log_admin(f"⏸️ [Auto] Trânsito detectado! Adiando Radar automático ID {f_id} para dar prioridade ao usuário.", "SISTEMA")
+                    continue # Pula e tenta rodar de novo no próximo ciclo de 60 segundos
+                    
                 await run_in_threadpool(executar_varredura, f_id)
-                print(f"✅ [Auto] Radar ID {f_id} finalizado!")
+                log_admin(f"✅ [Auto] Radar ID {f_id} finalizado!", "SISTEMA")
 
 @app.patch("/api/filtros/{filtro_id}/toggle")
 def toggle_timer(filtro_id: int, vagaz_user_id: Optional[str] = Cookie(None), db = Depends(get_db)):
@@ -667,6 +720,18 @@ def clear_table(tabela: str, db = Depends(get_db)):
     db.commit()
     return {"message": f"Tabela {tabela} limpa com sucesso!"}
 
+@app.delete("/api/admin/filtros/{filtro_id}/vagas")
+def limpar_vagas_filtro_admin(filtro_id: int, db = Depends(get_db)):
+    f_db = db.query(SearchFilter).filter(SearchFilter.id == filtro_id).first()
+    if not f_db:
+        raise HTTPException(status_code=404, detail="Radar não encontrado")
+    
+    apagadas = db.query(SavedJob).filter(SavedJob.filtro_id == filtro_id).delete()
+    db.commit()
+    
+    log_admin(f"Admin esvaziou {apagadas} vagas do radar ID {filtro_id}.", "SISTEMA")
+    return {"mensagem": f"Vagas do radar limpas com sucesso!"}
+
 # 1. SISTEMA DE LOGS EM TEMPO REAL
 admin_logs = []
 
@@ -805,7 +870,9 @@ def get_user_details(user_id: int, db = Depends(get_db)):
     for f in filtros:
         vagas = db.query(SavedJob).filter(SavedJob.filtro_id == f.id).all()
         dados_filtros.append({
-            "nome": f.nome_filtro, "termos": f.termos,
+            "id": f.id,  # <--- ERA SÓ ISSO AQUI QUE FALTAVA!
+            "nome": f.nome_filtro, 
+            "termos": f.termos,
             "vagas": [{"titulo": v.titulo, "empresa": v.empresa, "link": v.link} for v in vagas]
         })
     return {"filtros": dados_filtros}

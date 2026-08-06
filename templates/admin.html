@@ -519,10 +519,16 @@
                     <div class="bg-white dark:bg-darkCard rounded-xl border border-slate-200 dark:border-slate-700 mb-4 overflow-hidden shadow-sm">
                         <div class="bg-slate-50 dark:bg-slate-800/50 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                             <div>
-                                <h4 class="font-black text-slate-800 dark:text-white text-lg">${f.nome}</h4>
+                                <h4 class="font-black text-slate-800 dark:text-white text-lg">${f.nome} <span class="text-xs text-slate-400 font-normal ml-2">ID: ${f.id}</span></h4>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-magnifying-glass mr-1"></i> ${f.termos}</p>
                             </div>
-                            <span class="bg-brand text-slate-900 px-3 py-1 rounded-lg font-black text-sm shadow-sm">${f.vagas.length} VAGAS</span>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand text-slate-900 px-3 py-1.5 rounded-lg font-black text-sm shadow-sm">${f.vagas.length} VAGAS</span>
+                                <!-- BOTÃO NOVO: Limpar Vagas do Radar -->
+                                <button onclick="limparVagasRadarAdmin(${f.id}, ${id})" title="Apagar todos os resultados coletados por este radar" class="bg-red-100 text-red-600 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg transition-colors font-bold shadow-sm">
+                                    <i class="fa-solid fa-broom"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="p-4 max-h-60 overflow-y-auto">
                             ${f.vagas.length > 0 ? f.vagas.map(v => `
@@ -540,9 +546,25 @@
             } catch(e) { container.innerHTML = '<p class="text-red-500 text-center py-8">Erro ao carregar inspeção.</p>'; }
         }
 
+        // FUNÇÃO NOVA: Exclui as vagas via rota Admin e recarrega o modal
+        async function limparVagasRadarAdmin(filtroId, userId) {
+            if(confirm("Tem certeza que deseja apagar todas as vagas coletadas por este radar? O radar continuará existindo, apenas os resultados serão esvaziados.")) {
+                try {
+                    const res = await fetch(`${API_BASE}/filtros/${filtroId}/vagas`, { method: 'DELETE' });
+                    if(res.ok) {
+                        alert("Resultados do radar esvaziados com sucesso!");
+                        inspecionarUsuario(userId); // Recarrega os dados fresquinhos
+                        carregarUsuarios(); // Atualiza a contagem geral na tabela do fundo
+                    } else {
+                        alert("Erro ao limpar vagas.");
+                    }
+                } catch(e) { alert("Erro de conexão."); }
+            }
+        }
+
         function fecharModalInspecao() { document.getElementById('modal-inspecao').classList.add('hidden'); }
 
-        // BANCO DE DADOS
+        /// BANCO DE DADOS
         async function carregarTabelas() {
             const grid = document.getElementById('grid-tabelas');
             grid.innerHTML = '<p class="dark:text-slate-400 col-span-2 text-center py-8"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Lendo tabelas...</p>';
@@ -552,18 +574,46 @@
                 grid.innerHTML = '';
                 tabelas.forEach(t => {
                     grid.innerHTML += `
-                        <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center hover:border-brand dark:hover:border-brand transition-colors cursor-pointer group" onclick="verTabela('${t.nome}')">
-                            <div>
+                        <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center hover:border-brand dark:hover:border-brand transition-colors group">
+                            <div class="cursor-pointer flex-1" onclick="verTabela('${t.nome}')">
                                 <h4 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight group-hover:text-brand transition-colors">${t.nome}</h4>
                                 <p class="text-sm font-bold text-slate-400 mt-1">${t.linhas} registros salvos</p>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-brand/20 transition-colors">
-                                <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-brand"></i>
+                            <div class="flex items-center gap-3">
+                                <!-- BOTÃO NOVO: Limpar Tabela Individual -->
+                                <button onclick="limparTabelaUnica('${t.nome}')" title="Esvaziar esta tabela" class="bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-200 dark:border-red-500/30 w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0">
+                                    <i class="fa-solid fa-broom"></i>
+                                </button>
+                                <div class="bg-slate-50 dark:bg-slate-800 w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-brand/20 transition-colors cursor-pointer" onclick="verTabela('${t.nome}')">
+                                    <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-brand"></i>
+                                </div>
                             </div>
                         </div>
                     `;
                 });
             } catch(e) {}
+        }
+
+        // FUNÇÃO NOVA: Executa a limpeza da tabela individual
+        async function limparTabelaUnica(tabela) {
+            let aviso = `Você está prestes a DELETAR TODOS OS DADOS da tabela "${tabela.toUpperCase()}".\nTem certeza?`;
+            
+            if (tabela === 'users') {
+                aviso += `\n\nATENÇÃO: Apagar a tabela de usuários excluirá todos os clientes (exceto o seu Admin). Isso pode deixar vagas e radares órfãos no banco. Use com extrema cautela!`;
+            }
+            
+            if(confirm(aviso)) {
+                try {
+                    const res = await fetch(`${API_BASE}/db/clear/${tabela}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if(res.ok) {
+                        alert(data.message || "Tabela limpa com sucesso!");
+                        carregarTabelas(); // Atualiza as contagens na tela
+                    } else {
+                        alert("Erro ao limpar tabela.");
+                    }
+                } catch(e) { alert("Erro de conexão."); }
+            }
         }
 
         async function verTabela(nome) {

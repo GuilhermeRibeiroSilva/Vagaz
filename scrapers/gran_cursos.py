@@ -27,6 +27,7 @@ def buscar_concursos_gran(termo: str, max_paginas: int = 2, headless: bool = Tru
 
         print(f"🤖 [Gran Cursos] Acessando: {url_alvo}")
         
+        # --- 1. TRY MESTRE AQUI ---
         try:
             page.goto(url_alvo, wait_until="domcontentloaded", timeout=40000)
             page.wait_for_timeout(2000)
@@ -203,11 +204,16 @@ def buscar_concursos_gran(termo: str, max_paginas: int = 2, headless: bool = Tru
 
             print(f"✅ [Gran Cursos] {len(vagas_brutas_totais)} editais encontrados e filtrados para '{termo}'.")
 
+        # --- 2. EXCEPT MESTRE ---
         except Exception as e:
             print(f"❌ Erro na extração do Gran Cursos: {e}")
-        
-        browser.close()
-        
+
+        # --- 3. FINALLY MESTRE ---
+        finally:
+            page.close()
+            browser.close()
+
+        # O processamento do resultado fica FORA do finally, perfeitamente alinhado.
         for vaga_str in vagas_brutas_totais:
             partes = vaga_str.split('|||')
             if len(partes) >= 5:
