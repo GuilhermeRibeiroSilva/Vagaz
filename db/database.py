@@ -5,10 +5,8 @@ import bcrypt
 import os
 from dotenv import load_dotenv
 
-# Carrega as variáveis do arquivo .env
 load_dotenv()
 
-# 1. CONEXÃO COM O BANCO DE DADOS
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL)
@@ -25,23 +23,24 @@ class User(Base):
     
     is_admin = Column(Boolean, default=False)
     
-    vagas_salvas = relationship("SavedJob", back_populates="dono")
-    filtros = relationship("SearchFilter", back_populates="dono")
+    vagas_salvas = relationship("SavedJob", back_populates="dono", cascade="all, delete-orphan")
+    filtros = relationship("SearchFilter", back_populates="dono", cascade="all, delete-orphan")
+    configuracao = relationship("UserConfig", back_populates="dono", uselist=False, cascade="all, delete-orphan")
 
 class SavedJob(Base):
     __tablename__ = "saved_jobs"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    filtro_id = Column(Integer, ForeignKey("search_filters.id"), nullable=True) 
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    filtro_id = Column(Integer, ForeignKey("search_filters.id", ondelete="CASCADE"), index=True, nullable=True) 
     tipo_busca = Column(String, default="Vagas") 
-    scraper = Column(String, default="Desconhecido") 
+    scraper = Column(String, default="Desconhecido", index=True)
     empresa = Column(String, default="Confidencial") 
     titulo = Column(String, nullable=False)
     link = Column(String, nullable=False)
     data_publicacao = Column(String)
     local = Column(String)
     formato = Column(String)
-    data_salva = Column(DateTime, default=datetime.utcnow)
+    data_salva = Column(DateTime, default=datetime.utcnow, index=True)
     
     dono = relationship("User", back_populates="vagas_salvas")
     radar = relationship("SearchFilter")
@@ -49,7 +48,7 @@ class SavedJob(Base):
 class SearchFilter(Base):
     __tablename__ = "search_filters"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
     tipo_busca = Column(String, default="Vagas") 
     nome_filtro = Column(String, nullable=False)
     termos = Column(String, nullable=False)
@@ -58,7 +57,7 @@ class SearchFilter(Base):
     formato = Column(String)
     scrapers = Column(String)
     max_dias = Column(Integer, default=30)
-    timer_ativo = Column(Boolean, default=False)
+    timer_ativo = Column(Boolean, default=False, index=True)
     intervalo_timer = Column(Integer, default=60) 
     ativo = Column(Boolean, default=True)
     ultima_varredura = Column(DateTime, nullable=True)
@@ -73,31 +72,33 @@ class AppConfig(Base):
 class UserConfig(Base):
     __tablename__ = "user_configs"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True)
     auto_limpeza_ativa = Column(Boolean, default=False)
-    auto_limpeza_meses = Column(Integer, default=3) # Padrão: apaga vagas com mais de 3 meses    
-
+    auto_limpeza_dias = Column(Integer, default=30) 
+    receber_emails = Column(Boolean, default=True) 
+    
+    dono = relationship("User", back_populates="configuracao")
 
 if __name__ == "__main__":
-    print("⏳ Atualizando tabelas no PostgreSQL...")
+    print("⏳ Atualizando tabelas no PostgreSQL (Otimizado com Índices)...")
     Base.metadata.drop_all(bind=engine) 
     Base.metadata.create_all(bind=engine) 
     
     print("⏳ Injetando usuário Admin e Configurações Individuais dos Scrapers...")
     db = SessionLocal()
     try:
-        # 1. Configurações Individuais de Headless para cada um dos 11 scrapers (True = Escondido)
-        scrapers_lista = ["Empregos", "InfoJobs", "Gupy", "LinkedIn", "Indeed", "Programathor", "Remotar", "PCI", "C_Brasil", "Gran", "Folha_QC"]
+        scrapers_lista = ["Empregos", "InfoJobs", "Gupy", "LinkedIn", "Remotar", "PCI", "C_Brasil"]
         for s in scrapers_lista:
             db.add(AppConfig(chave=f"headless_{s}", valor="true"))
         
-        # 2. Usuário Administrador (Agora com a senha criptografada corretamente)
-        senha_pura = "adminvagaz21"
+        senha_pura = os.getenv("ADMIN_PASSWORD", "mudar_senha_imediatamente")
+        admin_email = os.getenv("ADMIN_EMAIL", "admin@vagaz.com")
+        
         senha_blindada = bcrypt.hashpw(senha_pura.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
         admin_user = User(
             nome="Administrador",
-            email="admin@vagaz.com",
+            email=admin_email,
             senha_hash=senha_blindada, 
             is_admin=True
         )
@@ -111,4 +112,4 @@ if __name__ == "__main__":
     finally:
         db.close()
         
-    print("✅ SUCESSO! Banco de Dados atualizado e pronto!")
+    print("✅ SUCESSO! Banco de Dados atualizado, indexado e pronto!")

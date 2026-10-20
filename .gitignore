@@ -1,23 +1,26 @@
-# Senhas e Variáveis de Ambiente
+# Senhas
 .env
 
-# Pastas Virtuais do Python
+# Pastas do Python
 venv/
 env/
 .venv/
 
-# Arquivos temporários e Cache do Python
+# Arquivos do Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .pytest_cache/
 
-# Logs e Banco de Dados Local (se houver)
+# Logs e BD
 logs/
 *.log
 *.sqlite3
 
+# Arquivos de Configuração do Sistema
 Comandos.txt
 ssh-key-2026-04-07.key
 ssh-key-2026-04-07.key.pub
+Criar_admin.py
+teste_Postgre.py

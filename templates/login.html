@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vagaz</title>
-
-    <link rel="icon" type="image/png" href="/static/Remoto.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%2334d399%22 d=%22M256 0c141.4 0 256 114.6 256 256c0 141.4-114.6 256-256 256C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0zM128 320a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z%22/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="/static/css/login.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -29,82 +27,30 @@
             }
         }
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        body.light-theme {
-            background-color: #f8fafc;
-            background-image:
-                radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.15) 0px, transparent 50%);
-        }
-
-        body.dark {
-            background-color: #0f172a;
-            background-image:
-                radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.05) 0px, transparent 50%);
-        }
-
-        .form-slider {
-            display: flex;
-            width: 200%;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-panel {
-            width: 50%;
-            padding: 0 0.5rem;
-        }
-
-        #toast {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-    </style>
 </head>
-
 <body class="light-theme min-h-screen flex flex-col items-center justify-center p-4 relative text-gray-800 dark:text-gray-200">
-
-    <!-- Botão de Tema Padronizado com o Dashboard -->
     <button onclick="toggleTheme()" class="absolute top-8 right-8 text-slate-400 hover:text-brand transition-colors text-2xl p-2 outline-none">
         <i id="theme-icon" class="fa-solid fa-moon"></i>
     </button>
-
-    <!-- Notificações Toast -->
     <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium opacity-0 pointer-events-none transform -translate-y-4 z-50">
         <span id="toast-message">Mensagem aqui</span>
     </div>
-
-    <!-- Card Central com mais respiro (p-10) -->
     <div class="max-w-sm w-full bg-white dark:bg-darkCard rounded-[2rem] shadow-xl overflow-hidden p-10 relative transition-colors duration-300">
-
-        <!-- Logo / Nome -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-softBg dark:bg-slate-800 mb-5 shadow-sm">
-                <img src="/static/Remoto.png" alt="Vagaz Logo" class="w-10 h-10 object-contain">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand to-teal-600 mb-5 shadow-lg shadow-brand/30 transform transition-transform hover:scale-105">
+                <i class="fa-solid fa-satellite-dish text-3xl text-white"></i>
             </div>
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-white tracking-tight">Vagaz</h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm">O seu radar de oportunidades.</p>
+            <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand to-teal-500 tracking-tighter">Vagaz</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm font-medium">O seu radar de oportunidades.</p>
         </div>
-
-        <!-- Seletor Pílula -->
         <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex mb-10 relative">
             <div id="slider-bg" class="absolute w-1/2 h-[85%] bg-white dark:bg-slate-700 shadow-sm rounded-lg top-1/2 -translate-y-1/2 left-1 transition-all duration-300 ease-in-out">
             </div>
             <button onclick="switchTab('login')" id="btn-login" class="flex-1 py-2.5 text-sm font-semibold z-10 text-brand dark:text-teal-400 transition-colors">Entrar</button>
             <button onclick="switchTab('register')" id="btn-register" class="flex-1 py-2.5 text-sm font-semibold z-10 text-gray-500 dark:text-gray-400 transition-colors">Cadastrar</button>
         </div>
-
-        <!-- Formulários com mais espaçamento (space-y-5) -->
         <div class="overflow-hidden">
             <div id="form-slider" class="form-slider translate-x-0">
-
-                <!-- 1. Formulário de Login -->
                 <div class="form-panel">
                     <form id="form-login" class="space-y-5">
                         <div>
@@ -118,7 +64,6 @@
                                     placeholder="seu@email.com" required>
                             </div>
                         </div>
-
                         <div>
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">Senha</label>
                             <div class="relative">
@@ -130,15 +75,12 @@
                                     placeholder="••••••••" required>
                             </div>
                         </div>
-
                         <button type="submit" id="btn-submit-login"
                             class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand/30 active:scale-[0.98] mt-6 flex justify-center items-center">
                             Acessar Vagaz
                         </button>
                     </form>
                 </div>
-
-                <!-- 2. Formulário de Cadastro -->
                 <div class="form-panel">
                     <form id="form-register" class="space-y-5">
                         <div>
@@ -152,7 +94,6 @@
                                     placeholder="Seu nome" required>
                             </div>
                         </div>
-
                         <div>
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">E-mail</label>
                             <div class="relative">
@@ -164,7 +105,6 @@
                                     placeholder="seu@email.com" required>
                             </div>
                         </div>
-
                         <div>
                             <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1.5 ml-1 uppercase tracking-wider">Crie uma senha</label>
                             <div class="relative">
@@ -176,162 +116,15 @@
                                     placeholder="Mínimo 6 caracteres" required>
                             </div>
                         </div>
-
                         <button type="submit" id="btn-submit-reg"
                             class="w-full bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg active:scale-[0.98] mt-6 flex justify-center items-center">
                             Criar conta
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
-
-    <!-- Scripts Logicos -->
-    <script>
-        // --- 1. LÓGICA DO TEMA (DARK/LIGHT MODE) ---
-        function toggleTheme() {
-            const html = document.documentElement;
-            const body = document.body;
-            const icon = document.getElementById('theme-icon');
-
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                body.classList.remove('dark');
-                body.classList.add('light-theme');
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.classList.add('dark');
-                body.classList.add('dark');
-                body.classList.remove('light-theme');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            toggleTheme(); 
-        }
-
-        // --- 2. LÓGICA DO SLIDER (LOGIN / CADASTRO) ---
-        function switchTab(tab) {
-            const slider = document.getElementById('form-slider');
-            const sliderBg = document.getElementById('slider-bg');
-            const btnLogin = document.getElementById('btn-login');
-            const btnRegister = document.getElementById('btn-register');
-
-            if (tab === 'register') {
-                slider.style.transform = 'translateX(-50%)';
-                sliderBg.style.left = 'calc(50% - 4px)';
-
-                btnRegister.classList.remove('text-gray-500', 'dark:text-gray-400');
-                btnRegister.classList.add('text-brand', 'dark:text-teal-400');
-
-                btnLogin.classList.remove('text-brand', 'dark:text-teal-400');
-                btnLogin.classList.add('text-gray-500', 'dark:text-gray-400');
-            } else {
-                slider.style.transform = 'translateX(0)';
-                sliderBg.style.left = '4px';
-
-                btnLogin.classList.remove('text-gray-500', 'dark:text-gray-400');
-                btnLogin.classList.add('text-brand', 'dark:text-teal-400');
-
-                btnRegister.classList.remove('text-brand', 'dark:text-teal-400');
-                btnRegister.classList.add('text-gray-500', 'dark:text-gray-400');
-            }
-        }
-
-        // --- 3. LÓGICA DE ALERTAS (TOAST) ---
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = message;
-
-            if (isError) {
-                toast.classList.replace('bg-brand', 'bg-red-500') || toast.classList.add('bg-red-500');
-            } else {
-                toast.classList.replace('bg-red-500', 'bg-brand') || toast.classList.add('bg-brand');
-            }
-
-            toast.classList.remove('opacity-0', '-translate-y-4');
-            toast.classList.add('opacity-100', 'translate-y-0');
-
-            setTimeout(() => {
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                toast.classList.add('opacity-0', '-translate-y-4');
-            }, 4000);
-        }
-
-        // --- 4. CONEXÃO COM O BACKEND (API) ---
-        document.getElementById('form-register').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-reg');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-            const nome = document.getElementById('reg-nome').value;
-            const email = document.getElementById('reg-email').value;
-            const senha = document.getElementById('reg-senha').value;
-
-            try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, email, senha })
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    showToast("Conta criada com sucesso! Faça login.", false);
-                    switchTab('login');
-                    document.getElementById('login-email').value = email;
-                } else {
-                    showToast(data.detail, true);
-                }
-            } catch (err) {
-                showToast("Erro no servidor.", true);
-            }
-            btn.innerHTML = 'Criar conta';
-        });
-
-        document.getElementById('form-login').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const inputEmail = this.querySelector('input[type="email"]');
-            const inputSenha = this.querySelector('input[type="password"]');
-
-            const dadosLogin = {
-                email: inputEmail.value,
-                senha: inputSenha.value,
-                lembrar: true // FORÇANDO A SESSÃO AUTOMÁTICA
-            };
-
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dadosLogin)
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    if (data.is_admin === true) {
-                        window.location.href = "/admin";
-                    } else {
-                        window.location.href = "/dashboard";
-                    }
-                } else {
-                    showToast(data.detail || "Erro ao fazer login", true);
-                }
-            } catch (error) {
-                showToast("Erro de comunicação com o servidor.", true);
-            }
-        });
-    </script>
+    <script src="/static/js/login.js" defer></script>
 </body>
-
 </html>

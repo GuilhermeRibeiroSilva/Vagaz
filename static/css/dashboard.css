@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    transition: background-color 0.3s ease, color 0.3s ease; 
+}
+
+body:not(.dark) { 
+    background-color: #f8fafc; 
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.15) 0px, transparent 50%), 
+        radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.15) 0px, transparent 50%); 
+}
+
+body.dark { 
+    background-color: #0f172a; 
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.05) 0px, transparent 50%), 
+        radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.05) 0px, transparent 50%); 
+}
+
+.tab-content { 
+    display: none; 
+}
+
+.tab-content.active { 
+    display: block; 
+    animation: fadeIn 0.3s; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(5px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+select.custom-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat; 
+    background-position: right 0.75rem center; 
+    background-size: 1em; 
+    padding-right: 2.5rem !important;
+}
+
+.tag-input-container { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 0.5rem; 
+    align-items: center; 
+    cursor: text; 
+}
+
+.tag-badge { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 0.25rem; 
+    font-weight: 700; 
+    font-size: 0.75rem; 
+    padding: 0.25rem 0.5rem; 
+    border-radius: 0.5rem; 
+}

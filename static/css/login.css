@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.light-theme {
+    background-color: #f8fafc;
+    background-image:
+        radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.15) 0px, transparent 50%);
+}
+
+body.dark {
+    background-color: #0f172a;
+    background-image:
+        radial-gradient(at 0% 0%, hsla(160, 100%, 74%, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, hsla(190, 100%, 76%, 0.05) 0px, transparent 50%);
+}
+
+.form-slider {
+    display: flex;
+    width: 200%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-panel {
+    width: 50%;
+    padding: 0 0.5rem;
+}
+
+#toast {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
