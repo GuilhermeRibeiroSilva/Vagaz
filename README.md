@@ -8,7 +8,7 @@
 
 Uma plataforma web automatizada projetada para rastrear, consolidar e notificar oportunidades de emprego (CLT/PJ) e concursos públicos no Brasil, centralizando tudo em um painel único e moderno.
 
-🌐 **Acesse a plataforma ao vivo:** [[Acesse aqui!](https://vagaz.duckdns.org/)]
+🌐 **Acesse a plataforma:** [[Acesse aqui!](https://vagaz.duckdns.org/)]
 
 ---
 
