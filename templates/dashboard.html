@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vagaz - Rastreadores</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%2334d399%22 d=%22M256 0c141.4 0 256 114.6 256 256c0 141.4-114.6 256-256 256C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0zM128 320a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z%22/></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%2334d399%22 d=%22M256 0c141.4 0 256 114.6 256 256c0 141.4-114.6 256-256 256C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0zM128 320a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z%22/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/dashboard.css">
@@ -17,53 +19,70 @@
         }
     </script>
 </head>
-<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex transition-colors">
 
-    <div id="barra-bulk" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-brand text-white px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-6 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none">
+<body
+    class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex transition-colors">
+
+    <div id="barra-bulk"
+        class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-brand text-white px-6 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-6 transition-all duration-300 translate-y-24 opacity-0 pointer-events-none">
         <div class="flex items-center gap-3">
             <span class="bg-white/20 px-3 py-1 rounded-lg font-black text-lg" id="bulk-count">0</span>
             <span class="font-medium text-sm">vagas selecionadas</span>
         </div>
         <div class="w-px h-8 bg-white/20"></div>
-        <button onclick="excluirSelecionadas()" class="hover:bg-red-500 hover:text-white text-red-400 bg-white/10 px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2">
+        <button onclick="excluirSelecionadas()"
+            class="hover:bg-red-500 hover:text-white text-red-400 bg-white/10 px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2">
             <i class="fa-solid fa-trash-can"></i> Excluir Selecionadas
         </button>
-        <button onclick="limparSelecao()" class="text-slate-400 hover:text-white transition-colors" title="Cancelar seleção">
+        <button onclick="limparSelecao()" class="text-slate-400 hover:text-white transition-colors"
+            title="Cancelar seleção">
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
     </div>
 
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 px-6 py-4 rounded-2xl shadow-2xl text-white font-bold opacity-0 pointer-events-none transform -translate-y-4 z-[100] transition-all flex items-center gap-3 border border-white/20 min-w-[300px] justify-center">
+    <div id="toast"
+        class="fixed top-6 left-1/2 -translate-x-1/2 px-6 py-4 rounded-2xl shadow-2xl text-white font-bold opacity-0 pointer-events-none transform -translate-y-4 z-[100] transition-all flex items-center gap-3 border border-white/20 min-w-[300px] justify-center">
         <i id="toast-icon" class="fa-solid fa-circle-info text-xl"></i>
         <span id="toast-message" class="text-sm">Mensagem</span>
     </div>
 
-    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[100] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
-        <div id="modal-confirm-content" class="bg-white dark:bg-darkCard w-full max-w-sm rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl text-center">
-            <div id="confirm-icon-bg" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6 shadow-lg">
+    <div id="modal-confirm"
+        class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[100] flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div id="modal-confirm-content"
+            class="bg-white dark:bg-darkCard w-full max-w-sm rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl text-center">
+            <div id="confirm-icon-bg"
+                class="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-6 shadow-lg">
                 <i id="confirm-icon" class="fa-solid fa-triangle-exclamation text-4xl"></i>
             </div>
             <h3 id="confirm-title" class="text-2xl font-black dark:text-white mb-3">Tem certeza?</h3>
-            <p id="confirm-text" class="text-slate-500 dark:text-slate-400 text-sm mb-8 font-medium leading-relaxed">Esta ação não poderá ser desfeita.</p>
+            <p id="confirm-text" class="text-slate-500 dark:text-slate-400 text-sm mb-8 font-medium leading-relaxed">
+                Esta ação não poderá ser desfeita.</p>
             <div class="flex gap-4 w-full">
-                <button id="btn-confirm-cancel" class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3.5 rounded-xl transition-colors">Cancelar</button>
-                <button id="btn-confirm-ok" class="flex-1 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg active:scale-95">Confirmar</button>
+                <button id="btn-confirm-cancel"
+                    class="flex-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3.5 rounded-xl transition-colors">Cancelar</button>
+                <button id="btn-confirm-ok"
+                    class="flex-1 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg active:scale-95">Confirmar</button>
             </div>
         </div>
     </div>
 
-    <aside class="w-64 bg-white dark:bg-darkCard shadow-lg flex flex-col h-full z-20 border-r border-slate-200 dark:border-slate-800">
+    <aside
+        class="w-64 bg-white dark:bg-darkCard shadow-lg flex flex-col h-full z-20 border-r border-slate-200 dark:border-slate-800">
         <div class="p-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-700">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-teal-600 flex items-center justify-center text-white shadow-lg shadow-brand/30 transform transition-transform hover:scale-105">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-teal-600 flex items-center justify-center text-white shadow-lg shadow-brand/30 transform transition-transform hover:scale-105">
                 <i class="fa-solid fa-satellite-dish text-xl"></i>
             </div>
-            <span class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand to-teal-500 tracking-tighter">VAGAZ</span>
+            <span
+                class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand to-teal-500 tracking-tighter">VAGAZ</span>
         </div>
         <nav class="p-6 space-y-2 flex-1">
-            <button onclick="changeTab('filtros')" id="nav-filtros" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand/10 text-brand font-medium transition-colors">
+            <button onclick="changeTab('filtros')" id="nav-filtros"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand/10 text-brand font-medium transition-colors">
                 <i class="fa-solid fa-satellite-dish w-5"></i> Rastreadores
             </button>
-            <button onclick="changeTab('resultados'); carregarResultados();" id="nav-resultados" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium">
+            <button onclick="changeTab('resultados'); carregarResultados();" id="nav-resultados"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium">
                 <i class="fa-solid fa-briefcase w-5"></i> Oportunidades
             </button>
         </nav>
@@ -71,11 +90,15 @@
             <div class="flex items-center justify-between mb-4">
                 <p class="text-sm font-bold dark:text-white truncate pr-2" title="{{ user.nome }}">{{ user.nome }}</p>
                 <div class="flex items-center gap-3">
-                    <button onclick="abrirConfiguracoes()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
-                    <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+                    <button onclick="abrirConfiguracoes()"
+                        class="text-slate-400 hover:text-brand transition-colors text-lg"><i
+                            class="fa-solid fa-gear"></i></button>
+                    <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i
+                            id="theme-icon" class="fa-solid fa-moon"></i></button>
                 </div>
             </div>
-            <a href="/logout" class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2">
+            <a href="/logout"
+                class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2">
                 <i class="fa-solid fa-power-off"></i> Sair
             </a>
         </div>
@@ -83,31 +106,44 @@
 
     <main class="flex-1 h-full overflow-y-auto p-8 relative">
 
-        <div id="loader-overlay" class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
-            <div class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700 w-full max-w-sm text-center relative transition-all">
+        <div id="loader-overlay"
+            class="absolute inset-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center">
+            <div
+                class="bg-white dark:bg-darkCard p-8 rounded-3xl shadow-2xl flex flex-col items-center border border-slate-200 dark:border-slate-700 w-full max-w-sm text-center relative transition-all">
                 <i id="loader-icon" class="fa-solid fa-satellite-dish fa-beat-fade text-5xl text-brand mb-4"></i>
                 <h2 id="loader-title" class="text-xl font-black dark:text-white">Iniciando Motor...</h2>
-                <p id="loader-text" class="text-slate-600 dark:text-slate-300 text-sm mt-3 font-medium px-4 h-10 flex items-center justify-center">Entrando na fila do servidor...</p>
-                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mt-4 mb-2 overflow-hidden shadow-inner">
-                    <div id="loader-progress" class="bg-brand h-2 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                <p id="loader-text"
+                    class="text-slate-600 dark:text-slate-300 text-sm mt-3 font-medium px-4 h-10 flex items-center justify-center">
+                    Entrando na fila do servidor...</p>
+                <div
+                    class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mt-4 mb-2 overflow-hidden shadow-inner">
+                    <div id="loader-progress" class="bg-brand h-2 rounded-full transition-all duration-500 ease-out"
+                        style="width: 0%"></div>
                 </div>
                 <div id="loader-actions" class="mt-6 flex flex-col gap-3 w-full">
-                    <button onclick="ocultarLoaderSegundoPlano()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+                    <button onclick="ocultarLoaderSegundoPlano()"
+                        class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-down-left-and-up-right-to-center"></i> Rodar em Segundo Plano
                     </button>
-                    <button onclick="cancelarVarreduraFrontend()" class="w-full bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+                    <button onclick="cancelarVarreduraFrontend()"
+                        class="w-full bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-xmark"></i> Abortar Missão
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="widget-segundo-plano" class="fixed bottom-6 right-6 bg-white dark:bg-darkCard shadow-2xl border border-brand/50 rounded-2xl p-4 w-80 z-50 hidden transform transition-all cursor-pointer hover:scale-105 group" onclick="maximizarLoader()">
+        <div id="widget-segundo-plano"
+            class="fixed bottom-6 right-6 bg-white dark:bg-darkCard shadow-2xl border border-brand/50 rounded-2xl p-4 w-80 z-50 hidden transform transition-all cursor-pointer hover:scale-105 group"
+            onclick="maximizarLoader()">
             <div class="flex items-center gap-4">
                 <i class="fa-solid fa-satellite-dish fa-spin text-brand text-3xl"></i>
                 <div class="flex-1 overflow-hidden">
-                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 group-hover:text-brand transition-colors">Rastreador Ativo <i class="fa-solid fa-expand ml-1"></i></p>
-                    <p id="widget-status" class="text-sm font-bold text-slate-700 dark:text-white truncate">Calculando...</p>
+                    <p
+                        class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 group-hover:text-brand transition-colors">
+                        Rastreador Ativo <i class="fa-solid fa-expand ml-1"></i></p>
+                    <p id="widget-status" class="text-sm font-bold text-slate-700 dark:text-white truncate">
+                        Calculando...</p>
                 </div>
             </div>
         </div>
@@ -118,7 +154,8 @@
                     <h2 class="text-3xl font-black dark:text-white">Meus Rastreadores</h2>
                     <p class="text-slate-500 text-sm mt-1">Gerencie os seus agentes de busca</p>
                 </div>
-                <button onclick="openModal()" class="bg-brand hover:bg-brandHover text-white px-5 py-3 rounded-xl shadow-lg shadow-brand/30 font-bold flex items-center gap-2 transition-all active:scale-95">
+                <button onclick="openModal()"
+                    class="bg-brand hover:bg-brandHover text-white px-5 py-3 rounded-xl shadow-lg shadow-brand/30 font-bold flex items-center gap-2 transition-all active:scale-95">
                     <i class="fa-solid fa-plus"></i> Novo Rastreador
                 </button>
             </div>
@@ -128,22 +165,34 @@
         <section id="tab-resultados" class="tab-content max-w-6xl mx-auto flex-col h-[85vh] hidden">
             <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 class="text-3xl font-black dark:text-white">Oportunidades</h2>
-                <div class="bg-white dark:bg-darkCard inline-flex p-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                    <button onclick="mudarSubAba('radar')" id="btn-sub-radar" class="px-5 py-2 rounded-lg text-sm font-bold bg-brand text-white shadow transition-all">Por Rastreador</button>
-                    <button onclick="mudarSubAba('vagas')" id="btn-sub-vagas" class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas as Vagas</button>
-                    <button onclick="mudarSubAba('concursos')" id="btn-sub-concursos" class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas os Concursos</button>
+                <div
+                    class="bg-white dark:bg-darkCard inline-flex p-1 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <button onclick="mudarSubAba('radar')" id="btn-sub-radar"
+                        class="px-5 py-2 rounded-lg text-sm font-bold bg-brand text-white shadow transition-all">Por
+                        Rastreador</button>
+                    <button onclick="mudarSubAba('vagas')" id="btn-sub-vagas"
+                        class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas
+                        as Vagas</button>
+                    <button onclick="mudarSubAba('concursos')" id="btn-sub-concursos"
+                        class="px-5 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-all">Todas
+                        os Concursos</button>
                 </div>
             </div>
 
-            <div id="barra-filtros-locais" class="hidden bg-white dark:bg-darkCard p-4 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-center transition-all">
+            <div id="barra-filtros-locais"
+                class="hidden bg-white dark:bg-darkCard p-4 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-center transition-all">
                 <div class="relative w-full">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="filtro-texto" onkeyup="filtrarResultadosLocais()" placeholder="Buscar por termo ou empresa..." class="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white transition-colors">
+                    <input type="text" id="filtro-texto" onkeyup="filtrarResultadosLocais()"
+                        placeholder="Buscar por termo ou empresa..."
+                        class="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white transition-colors">
                 </div>
-                
+
                 <div class="relative w-full">
-                    <i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
-                    <select id="filtro-local" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-11 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                    <i
+                        class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
+                    <select id="filtro-local" onchange="filtrarResultadosLocais()"
+                        class="custom-select w-full pl-11 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
                         <option value="">Qualquer Localização</option>
                         <optgroup label="Geral">
                             <option value="brasil">Qualquer lugar do Brasil</option>
@@ -213,14 +262,16 @@
 
                 <div class="relative w-full">
                     <i class="fa-solid fa-robot absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
-                    <select id="filtro-scraper" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-11 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                    <select id="filtro-scraper" onchange="filtrarResultadosLocais()"
+                        class="custom-select w-full pl-11 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
                         <option value="todos">Qualquer Plataforma</option>
                     </select>
                 </div>
 
                 <div class="relative w-full">
                     <i class="fa-solid fa-sort absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10"></i>
-                    <select id="filtro-ordem" onchange="filtrarResultadosLocais()" class="custom-select w-full pl-11 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
+                    <select id="filtro-ordem" onchange="filtrarResultadosLocais()"
+                        class="custom-select w-full pl-11 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-medium outline-none focus:border-brand dark:text-white cursor-pointer transition-colors relative">
                         <option value="data-recente">Mais Recentes (Data Real)</option>
                         <option value="data-antiga">Mais Antigas (Data Real)</option>
                     </select>
@@ -231,49 +282,73 @@
         </section>
     </main>
 
-    <div id="modal-config" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4 overflow-y-auto">
-        <div class="bg-white dark:bg-darkCard w-full max-w-xl rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl my-auto max-h-[95vh] overflow-y-auto" id="modal-config-content">
+    <div id="modal-config"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-darkCard w-full max-w-xl rounded-3xl p-8 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl my-auto max-h-[95vh] overflow-y-auto"
+            id="modal-config-content">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-black dark:text-white"><i class="fa-solid fa-user-gear text-brand mr-2"></i> Configurações</h3>
-                <button onclick="fecharConfiguracoes()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-2xl font-black dark:text-white"><i class="fa-solid fa-user-gear text-brand mr-2"></i>
+                    Configurações</h3>
+                <button onclick="fecharConfiguracoes()"
+                    class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form id="form-perfil" class="space-y-4 mb-8">
-                <h4 class="text-sm font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">Meu Perfil</h4>
+                <h4
+                    class="text-sm font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">
+                    Meu Perfil</h4>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2 md:col-span-1">
                         <label class="block text-xs font-bold text-slate-500 mb-1">Nome</label>
-                        <input type="text" id="cfg-nome" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm dark:text-white outline-none focus:border-brand" required>
+                        <input type="text" id="cfg-nome"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm dark:text-white outline-none focus:border-brand"
+                            required>
                     </div>
                     <div class="col-span-2 md:col-span-1">
                         <label class="block text-xs font-bold text-slate-500 mb-1">E-mail</label>
-                        <input type="email" id="cfg-email" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm dark:text-white outline-none focus:border-brand" required>
+                        <input type="email" id="cfg-email"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm dark:text-white outline-none focus:border-brand"
+                            required>
                     </div>
                     <div class="col-span-2">
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Nova Senha (deixe em branco para não alterar)</label>
-                        <input type="password" id="cfg-senha" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm dark:text-white outline-none focus:border-brand" placeholder="******">
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Nova Senha (deixe em branco para não
+                            alterar)</label>
+                        <input type="password" id="cfg-senha"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm dark:text-white outline-none focus:border-brand"
+                            placeholder="******">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all shadow-sm text-sm">Atualizar Perfil</button>
+                <button type="submit"
+                    class="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all shadow-sm text-sm">Atualizar
+                    Perfil</button>
             </form>
 
             <form id="form-config" class="space-y-5">
-                <h4 class="text-sm font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">Configurações do Sistema</h4>
-                
-                <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                <h4
+                    class="text-sm font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-2 mb-4">
+                    Configurações do Sistema</h4>
+
+                <div
+                    class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                     <div class="pr-4">
                         <p class="font-bold text-sm dark:text-white">Alertas por E-mail</p>
-                        <p class="text-xs text-slate-500">Receber notificações quando um rastreador em segundo plano encontrar novas vagas.</p>
+                        <p class="text-xs text-slate-500">Receber notificações quando um rastreador em segundo plano
+                            encontrar novas vagas.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer shrink-0">
                         <input type="checkbox" id="cfg-emails" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-slate-300 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                        <div
+                            class="w-11 h-6 bg-slate-300 dark:bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand">
+                        </div>
                     </label>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">Limpeza Automática de Vagas</label>
-                    <select id="cfg-limpeza" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-bold dark:text-white outline-none focus:border-brand transition-colors">
+                    <label class="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">Limpeza Automática de
+                        Vagas</label>
+                    <select id="cfg-limpeza"
+                        class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-bold dark:text-white outline-none focus:border-brand transition-colors">
                         <option value="0">Desativada (Manter até o limite global)</option>
                         <option value="15">A cada 15 dias</option>
                         <option value="30">A cada 30 dias</option>
@@ -281,34 +356,43 @@
                     </select>
                 </div>
 
-                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex gap-3 shadow-sm">
+                <div
+                    class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex gap-3 shadow-sm">
                     <i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5 text-lg"></i>
                     <p class="text-xs text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
-                        <strong>Política do Servidor:</strong> Para garantir o desempenho, todas as oportunidades salvas que atingirem <span class="text-red-600 dark:text-red-400 font-black">60 dias</span> serão descartadas permanentemente.
+                        <strong>Política do Servidor:</strong> Para garantir o desempenho, todas as oportunidades salvas
+                        que atingirem <span class="text-red-600 dark:text-red-400 font-black">60 dias</span> serão
+                        descartadas permanentemente.
                     </p>
                 </div>
 
-                <button type="submit" class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                <button type="submit"
+                    class="w-full bg-brand hover:bg-brandHover text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-floppy-disk"></i> Salvar Configurações
                 </button>
             </form>
 
             <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3">
-                <button onclick="modoFerias()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm">
+                <button onclick="modoFerias()"
+                    class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-pause"></i> Modo Férias (Pausar Todos os Rastreadores)
                 </button>
-                <button onclick="excluirMinhaConta()" class="w-full bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-500/30 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm">
+                <button onclick="excluirMinhaConta()"
+                    class="w-full bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 border border-red-200 dark:border-red-500/30 font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-triangle-exclamation"></i> Excluir Minha Conta (Irreversível)
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="modal-filtro" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
-        <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl p-8 max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl" id="modal-content">
+    <div id="modal-filtro"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl p-8 max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700 shadow-2xl"
+            id="modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-black dark:text-white" id="modal-title">Configurar Rastreador</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form id="form-filtro" class="space-y-6">
@@ -316,40 +400,61 @@
 
                 <div class="grid grid-cols-2 gap-5">
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Tipo de Busca</label>
-                        <select id="f-tipo" onchange="atualizarScrapers()" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Tipo
+                            de Busca</label>
+                        <select id="f-tipo" onchange="atualizarScrapers()"
+                            class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
                             <option value="Vagas">Setor Privado (Vagas CLT/PJ)</option>
                             <option value="Concursos">Setor Público (Concursos)</option>
                         </select>
                     </div>
 
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Nome do Rastreador</label>
-                        <input type="text" id="f-nome" class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors" placeholder="Ex: Desenvolvedor Backend Python" required>
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Nome
+                            do Rastreador</label>
+                        <input type="text" id="f-nome"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors"
+                            placeholder="Ex: Desenvolvedor Backend Python" required>
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Termos Alvo</label>
-                        <div class="tag-input-container bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 min-h-[46px] focus-within:border-brand transition-colors cursor-text" onclick="document.getElementById('f-termos-input').focus()">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Termos
+                            Alvo</label>
+                        <div class="tag-input-container bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 min-h-[46px] focus-within:border-brand transition-colors cursor-text"
+                            onclick="document.getElementById('f-termos-input').focus()">
                             <div id="tags-termos" class="flex flex-wrap gap-1.5"></div>
-                            <input type="text" id="f-termos-input" class="flex-1 bg-transparent outline-none text-sm dark:text-white min-w-[80px]" placeholder="Digite e aperte Enter">
+                            <input type="text" id="f-termos-input"
+                                class="flex-1 bg-transparent outline-none text-sm dark:text-white min-w-[80px]"
+                                placeholder="Digite e aperte Enter">
                         </div>
                         <p class="text-[10px] text-slate-400 mt-1">Insira a palavra e pressione Enter.</p>
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i class="fa-solid fa-ban text-red-400"></i> Palavras Proibidas</label>
-                        <div class="tag-input-container bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 min-h-[46px] focus-within:border-red-400 transition-colors cursor-text" onclick="document.getElementById('f-proibidas-input').focus()">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i
+                                class="fa-solid fa-ban text-red-400"></i> Palavras Proibidas</label>
+                        <div class="tag-input-container bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 min-h-[46px] focus-within:border-red-400 transition-colors cursor-text"
+                            onclick="document.getElementById('f-proibidas-input').focus()">
                             <div id="tags-proibidas" class="flex flex-wrap gap-1.5"></div>
-                            <input type="text" id="f-proibidas-input" class="flex-1 bg-transparent outline-none text-sm dark:text-white min-w-[80px]" placeholder="Digite e aperte Enter">
+                            <input type="text" id="f-proibidas-input"
+                                class="flex-1 bg-transparent outline-none text-sm dark:text-white min-w-[80px]"
+                                placeholder="Digite e aperte Enter">
                         </div>
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i class="fa-solid fa-location-dot text-indigo-400"></i> Localidades</label>
-                        <div class="tag-input-container bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 min-h-[46px] focus-within:border-indigo-400 transition-colors cursor-text">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase flex items-center gap-1"><i
+                                class="fa-solid fa-location-dot text-indigo-400"></i> Localidades</label>
+                        <div
+                            class="tag-input-container bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 min-h-[46px] focus-within:border-indigo-400 transition-colors cursor-text">
                             <div id="tags-local" class="flex flex-wrap gap-1.5"></div>
-                            <select id="f-local-select" onchange="adicionarTagLocal(this.value); this.value='';" class="flex-1 bg-transparent outline-none text-sm dark:text-slate-400 min-w-[140px] cursor-pointer appearance-none">
+                            <select id="f-local-select" onchange="adicionarTagLocal(this.value); this.value='';"
+                                class="flex-1 bg-transparent outline-none text-sm dark:text-slate-400 min-w-[140px] cursor-pointer appearance-none">
                                 <option value="" disabled selected>+ Adicionar local...</option>
                                 <optgroup label="Geral">
                                     <option value="Brasil">Brasil (Geral)</option>
@@ -419,8 +524,11 @@
                     </div>
 
                     <div class="col-span-2 md:col-span-1">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Data Limite (Recência)</label>
-                        <select id="f-data-max" class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1 tracking-wider uppercase">Data
+                            Limite (Recência)</label>
+                        <select id="f-data-max"
+                            class="custom-select w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-sm dark:text-white outline-none focus:border-brand transition-colors">
                             <option value="1">Apenas Hoje (24h)</option>
                             <option value="3">Últimos 3 dias</option>
                             <option value="7">Última Semana</option>
@@ -434,18 +542,24 @@
                     </div>
 
                     <div class="col-span-2">
-                        <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wider uppercase">Plataformas Alvo</label>
+                        <label
+                            class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 tracking-wider uppercase">Plataformas
+                            Alvo</label>
                         <div id="lista-scrapers" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
                     </div>
 
-                    <div class="col-span-2 bg-brand/5 border border-brand/20 p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 mt-2">
+                    <div
+                        class="col-span-2 bg-brand/5 border border-brand/20 p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 mt-2">
                         <div>
-                            <p class="font-bold text-brand flex items-center gap-2"><i class="fa-solid fa-robot"></i> Automação (Cronjob)</p>
+                            <p class="font-bold text-brand flex items-center gap-2"><i class="fa-solid fa-robot"></i>
+                                Automação (Cronjob)</p>
                             <p class="text-xs text-slate-500 mt-1">Adiciona o rastreador à fila global do servidor.</p>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl w-36">
-                                <select id="f-intervalo" class="bg-transparent text-sm font-bold dark:text-white outline-none cursor-pointer w-full text-center">
+                            <div
+                                class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-2 rounded-xl w-36">
+                                <select id="f-intervalo"
+                                    class="bg-transparent text-sm font-bold dark:text-white outline-none cursor-pointer w-full text-center">
                                     <option value="120" class="text-slate-800">A cada 2 Horas</option>
                                     <option value="360" class="text-slate-800">A cada 6 Horas</option>
                                     <option value="720" class="text-slate-800">A cada 12 Horas</option>
@@ -457,12 +571,21 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="salvarFiltro()" class="w-full bg-slate-800 dark:bg-brand hover:bg-slate-900 dark:hover:bg-brandHover text-white font-bold py-4 rounded-xl mt-6 transition-all shadow-lg shadow-brand/20 active:scale-[0.98]">
+                <button type="button" onclick="salvarFiltro()"
+                    class="w-full bg-slate-800 dark:bg-brand hover:bg-slate-900 dark:hover:bg-brandHover text-white font-bold py-4 rounded-xl mt-6 transition-all shadow-lg shadow-brand/20 active:scale-[0.98]">
                     <i class="fa-solid fa-floppy-disk mr-2"></i> Salvar Rastreador
                 </button>
             </form>
         </div>
     </div>
+    <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800/50 text-center">
+        <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+            Desenvolvido por <a href="https://github.com/GuilhermeRibeiroSilva" target="_blank"
+                class="font-bold text-slate-500 hover:text-brand dark:text-slate-400 dark:hover:text-brand transition-colors">Guilherme
+                Ribeiro</a>
+        </p>
+    </div>
     <script src="/static/js/dashboard.js" defer></script>
 </body>
+
 </html>

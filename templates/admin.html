@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vagaz - Painel de Controle</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%2334d399%22 d=%22M256 0c141.4 0 256 114.6 256 256c0 141.4-114.6 256-256 256C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0zM128 320a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z%22/></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><path fill=%22%2334d399%22 d=%22M256 0c141.4 0 256 114.6 256 256c0 141.4-114.6 256-256 256C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0zM128 320a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zM224 256a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z%22/></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/admin.css">
@@ -15,101 +17,167 @@
         }
     </script>
 </head>
+
 <body class="text-slate-800 dark:text-slate-200 h-screen flex overflow-hidden">
     <div id="toast-container" class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
-    <aside class="w-64 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex flex-col shadow-2xl z-20 border-r border-slate-200 dark:border-slate-800">
+    <aside
+        class="w-64 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md flex flex-col shadow-2xl z-20 border-r border-slate-200 dark:border-slate-800">
         <div class="p-6 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center text-slate-900 shadow-lg shadow-brand/30 transform transition-transform hover:scale-105">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand to-emerald-600 flex items-center justify-center text-slate-900 shadow-lg shadow-brand/30 transform transition-transform hover:scale-105">
                 <i class="fa-solid fa-satellite-dish text-xl"></i>
             </div>
-            <span class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand to-emerald-500 tracking-tighter">VAGAZ</span>
+            <span
+                class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand to-emerald-500 tracking-tighter">VAGAZ</span>
         </div>
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-            <button onclick="mudarAba('dashboard')" id="btn-dashboard" class="w-full flex items-center gap-3 px-4 py-3 bg-brand/20 text-brandHover dark:text-brand rounded-xl font-bold transition-all aba-btn"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</button>
-            <button onclick="mudarAba('scrapers')" id="btn-scrapers" class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl font-bold transition-all aba-btn"><i class="fa-solid fa-vial-circle-check w-5"></i> QA & Workers</button>
-            <button onclick="mudarAba('usuarios')" id="btn-usuarios" class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl font-bold transition-all aba-btn"><i class="fa-solid fa-users w-5"></i> Usuários</button>
-            <button onclick="mudarAba('database')" id="btn-database" class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl font-bold transition-all aba-btn"><i class="fa-solid fa-database w-5"></i> Banco de Dados</button>
+            <button onclick="mudarAba('dashboard')" id="btn-dashboard"
+                class="w-full flex items-center gap-3 px-4 py-3 bg-brand/20 text-brandHover dark:text-brand rounded-xl font-bold transition-all aba-btn"><i
+                    class="fa-solid fa-chart-pie w-5"></i> Dashboard</button>
+            <button onclick="mudarAba('scrapers')" id="btn-scrapers"
+                class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl font-bold transition-all aba-btn"><i
+                    class="fa-solid fa-vial-circle-check w-5"></i> QA & Workers</button>
+            <button onclick="mudarAba('usuarios')" id="btn-usuarios"
+                class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl font-bold transition-all aba-btn"><i
+                    class="fa-solid fa-users w-5"></i> Usuários</button>
+            <button onclick="mudarAba('database')" id="btn-database"
+                class="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl font-bold transition-all aba-btn"><i
+                    class="fa-solid fa-database w-5"></i> Banco de Dados</button>
         </nav>
         <div class="p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
             <div class="flex items-center justify-between mb-4">
                 <p class="text-sm font-bold dark:text-white truncate pr-2">{{ user.nome }}</p>
-                <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i id="theme-icon" class="fa-solid fa-moon"></i></button>
+                <button onclick="toggleTheme()" class="text-slate-400 hover:text-brand transition-colors text-lg"><i
+                        id="theme-icon" class="fa-solid fa-moon"></i></button>
             </div>
-            <a href="/logout" class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2"><i class="fa-solid fa-power-off"></i> Sair</a>
+            <a href="/logout"
+                class="text-sm text-red-500 hover:text-red-600 font-bold transition-colors flex items-center gap-2"><i
+                    class="fa-solid fa-power-off"></i> Sair</a>
         </div>
     </aside>
     <main class="flex-1 overflow-y-auto p-8 relative">
         <section id="aba-dashboard" class="space-y-8 animate-fade-in">
-            <h2 class="text-3xl font-black dark:text-white text-slate-800 flex items-center gap-4">Estatísticas <span class="bg-brand/20 text-brand text-[10px] uppercase font-black px-3 py-1 rounded-full animate-pulse flex items-center gap-1"><i class="fa-solid fa-circle text-[8px]"></i> Tempo Real</span></h2>
+            <h2 class="text-3xl font-black dark:text-white text-slate-800 flex items-center gap-4">Estatísticas <span
+                    class="bg-brand/20 text-brand text-[10px] uppercase font-black px-3 py-1 rounded-full animate-pulse flex items-center gap-1"><i
+                        class="fa-solid fa-circle text-[8px]"></i> Tempo Real</span></h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Vagas Hoje</p>
                     <h3 class="text-5xl font-black text-brand" id="stat-vagas-hoje">0</h3>
                 </div>
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total de Vagas</p>
                     <h3 class="text-4xl font-black dark:text-white" id="stat-vagas">0</h3>
                 </div>
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Usuários</p>
                     <h3 class="text-4xl font-black text-blue-500" id="stat-usuarios">0</h3>
                 </div>
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                     <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Radares Criados</p>
                     <h3 class="text-4xl font-black text-purple-500" id="stat-filtros-totais">0</h3>
                 </div>
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 col-span-1 md:col-span-4">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i> Top 3 Melhores Sites</p>
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 col-span-1 md:col-span-4">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4"><i
+                            class="fa-solid fa-trophy text-yellow-500 mr-2"></i> Top 3 Melhores Sites</p>
                     <div id="stat-top-scrapers" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                 </div>
             </div>
         </section>
         <section id="aba-scrapers" class="hidden space-y-6 animate-fade-in flex flex-col h-full">
             <h2 class="text-3xl font-black dark:text-white text-slate-800">QA & Processos</h2>
-            <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-                <h3 class="font-bold mb-2 dark:text-white"><i class="fa-solid fa-eye-slash text-brand mr-2"></i>Modo Invisível (Headless)</h3>
+            <div
+                class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                <h3 class="font-bold mb-2 dark:text-white"><i class="fa-solid fa-eye-slash text-brand mr-2"></i>Modo
+                    Invisível (Headless)</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="grid-scrapers"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-                    <h3 class="font-bold mb-4 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2"><i class="fa-solid fa-network-wired text-blue-500 mr-2"></i>Workers (Varreduras)</h3>
-                    <div class="flex justify-between bg-slate-50 dark:bg-slate-800 p-4 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
-                        <span class="font-bold text-slate-600 dark:text-slate-300">Radares na Fila:</span><span class="text-2xl font-black text-blue-500" id="status-fila">0</span>
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold mb-4 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2"><i
+                            class="fa-solid fa-network-wired text-blue-500 mr-2"></i>Workers (Varreduras)</h3>
+                    <div
+                        class="flex justify-between bg-slate-50 dark:bg-slate-800 p-4 rounded-xl mb-4 border border-slate-200 dark:border-slate-700">
+                        <span class="font-bold text-slate-600 dark:text-slate-300">Radares na Fila:</span><span
+                            class="text-2xl font-black text-blue-500" id="status-fila">0</span>
                     </div>
                     <div id="status-ativos" class="space-y-2"></div>
                 </div>
-                <div class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 max-h-[500px] overflow-y-auto terminal-scroll">
-                    <h3 class="font-bold mb-4 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 sticky top-0 bg-white dark:bg-darkCard z-10">
+                <div
+                    class="bg-white dark:bg-darkCard rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 max-h-[500px] overflow-y-auto terminal-scroll">
+                    <h3
+                        class="font-bold mb-4 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 sticky top-0 bg-white dark:bg-darkCard z-10">
                         <i class="fa-solid fa-shield-virus text-brand mr-2"></i>QA Tools: Diagnóstico (7 Alvos)
                     </h3>
                     <ul class="space-y-3" id="lista-qa-ping">
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">Gupy</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-gupy" class="w-24 text-right"></span><button id="qa-gupy" onclick="testarSite('qa-gupy', 'https://portal.gupy.io/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-gupy"
+                                    class="w-24 text-right"></span><button id="qa-gupy"
+                                    onclick="testarSite('qa-gupy', 'https://portal.gupy.io/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">LinkedIn</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-linkedin" class="w-24 text-right"></span><button id="qa-linkedin" onclick="testarSite('qa-linkedin', 'https://www.linkedin.com/jobs/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-linkedin"
+                                    class="w-24 text-right"></span><button id="qa-linkedin"
+                                    onclick="testarSite('qa-linkedin', 'https://www.linkedin.com/jobs/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">InfoJobs</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-infojobs" class="w-24 text-right"></span><button id="qa-infojobs" onclick="testarSite('qa-infojobs', 'https://www.infojobs.com.br/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-infojobs"
+                                    class="w-24 text-right"></span><button id="qa-infojobs"
+                                    onclick="testarSite('qa-infojobs', 'https://www.infojobs.com.br/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">Empregos.com</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-empregos" class="w-24 text-right"></span><button id="qa-empregos" onclick="testarSite('qa-empregos', 'https://www.empregos.com.br/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-empregos"
+                                    class="w-24 text-right"></span><button id="qa-empregos"
+                                    onclick="testarSite('qa-empregos', 'https://www.empregos.com.br/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">Remotar</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-remotar" class="w-24 text-right"></span><button id="qa-remotar" onclick="testarSite('qa-remotar', 'https://remotar.com.br/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-remotar"
+                                    class="w-24 text-right"></span><button id="qa-remotar"
+                                    onclick="testarSite('qa-remotar', 'https://remotar.com.br/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">PCI Concursos</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-pci" class="w-24 text-right"></span><button id="qa-pci" onclick="testarSite('qa-pci', 'https://www.pciconcursos.com.br/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-pci"
+                                    class="w-24 text-right"></span><button id="qa-pci"
+                                    onclick="testarSite('qa-pci', 'https://www.pciconcursos.com.br/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
-                        <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <li
+                            class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
                             <span class="font-bold text-slate-700 dark:text-slate-300 text-sm">Concursos Brasil</span>
-                            <div class="flex items-center gap-3"><span id="badge-qa-concursosbrasil" class="w-24 text-right"></span><button id="qa-concursosbrasil" onclick="testarSite('qa-concursosbrasil', 'https://concursosnobrasil.com/')" class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar Ping</button></div>
+                            <div class="flex items-center gap-3"><span id="badge-qa-concursosbrasil"
+                                    class="w-24 text-right"></span><button id="qa-concursosbrasil"
+                                    onclick="testarSite('qa-concursosbrasil', 'https://concursosnobrasil.com/')"
+                                    class="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-brand hover:text-slate-900 font-bold px-3 py-1.5 rounded">Testar
+                                    Ping</button></div>
                         </li>
                     </ul>
                 </div>
@@ -117,11 +185,16 @@
         </section>
         <section id="aba-usuarios" class="hidden space-y-6 animate-fade-in">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-black dark:text-white text-slate-800">Usuários</h2><button onclick="abrirModalCriarUsuario()" class="bg-brand text-slate-900 hover:bg-brandHover font-bold py-2 px-6 rounded-lg shadow-lg shadow-brand/30"><i class="fa-solid fa-user-plus mr-2"></i> Criar Usuário</button>
+                <h2 class="text-3xl font-black dark:text-white text-slate-800">Usuários</h2><button
+                    onclick="abrirModalCriarUsuario()"
+                    class="bg-brand text-slate-900 hover:bg-brandHover font-bold py-2 px-6 rounded-lg shadow-lg shadow-brand/30"><i
+                        class="fa-solid fa-user-plus mr-2"></i> Criar Usuário</button>
             </div>
-            <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div
+                class="bg-white dark:bg-darkCard rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-xs uppercase font-bold text-slate-500">
+                    <thead
+                        class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-xs uppercase font-bold text-slate-500">
                         <th class="p-4 w-16">ID</th>
                         <th class="p-4 w-1/4">Usuário</th>
                         <th class="p-4">Radares Ativos</th>
@@ -134,78 +207,139 @@
         </section>
         <section id="aba-database" class="hidden space-y-6 animate-fade-in">
             <h2 class="text-3xl font-black dark:text-white text-slate-800 mb-6">Painel de Dados</h2>
-            <h3 class="font-bold text-slate-700 dark:text-slate-300 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+            <h3
+                class="font-bold text-slate-700 dark:text-slate-300 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">
                 <i class="fa-solid fa-briefcase mr-2"></i>Tabelas de Negócio
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="grid-tabelas-negocio"></div>
-            <h3 class="font-bold text-slate-700 dark:text-slate-300 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+            <h3
+                class="font-bold text-slate-700 dark:text-slate-300 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">
                 <i class="fa-solid fa-cogs mr-2"></i>Tabelas do Sistema
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="grid-tabelas-sistema"></div>
-            <div class="mt-12 bg-red-50 dark:bg-red-500/10 border-2 border-dashed border-red-300 dark:border-red-500/30 rounded-2xl p-6">
-                <h3 class="text-red-600 dark:text-red-400 font-black text-xl mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Zona de Perigo</h3>
-                <p class="text-sm text-red-800/80 dark:text-red-200/60 mb-4">Ações irreversíveis que afetam o funcionamento do sistema.</p><button onclick="abrirNukeConfirm()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors shadow-lg shadow-red-600/30 flex items-center"><i class="fa-solid fa-radiation mr-2"></i> Limpar Todo o Banco de Dados</button>
+            <div
+                class="mt-12 bg-red-50 dark:bg-red-500/10 border-2 border-dashed border-red-300 dark:border-red-500/30 rounded-2xl p-6">
+                <h3 class="text-red-600 dark:text-red-400 font-black text-xl mb-2"><i
+                        class="fa-solid fa-triangle-exclamation mr-2"></i>Zona de Perigo</h3>
+                <p class="text-sm text-red-800/80 dark:text-red-200/60 mb-4">Ações irreversíveis que afetam o
+                    funcionamento do sistema.</p><button onclick="abrirNukeConfirm()"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg transition-colors shadow-lg shadow-red-600/30 flex items-center"><i
+                        class="fa-solid fa-radiation mr-2"></i> Limpar Todo o Banco de Dados</button>
             </div>
         </section>
     </main>
-    <div id="modal-confirm" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9000] flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700">
+    <div id="modal-confirm"
+        class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9000] flex justify-center items-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700">
             <div class="p-6 text-center">
-                <div id="confirm-icon" class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl"></div>
+                <div id="confirm-icon"
+                    class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl"></div>
                 <h3 id="confirm-title" class="text-xl font-black dark:text-white mb-2"></h3>
                 <p id="confirm-message" class="text-sm text-slate-500 dark:text-slate-400 mb-6"></p>
-                <div class="flex gap-3"><button onclick="fecharConfirm()" class="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold py-2.5 rounded-lg">Cancelar</button><button id="confirm-btn-yes" class="flex-1 text-white font-bold py-2.5 rounded-lg shadow-lg">Sim, Continuar</button></div>
+                <div class="flex gap-3"><button onclick="fecharConfirm()"
+                        class="flex-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold py-2.5 rounded-lg">Cancelar</button><button
+                        id="confirm-btn-yes" class="flex-1 text-white font-bold py-2.5 rounded-lg shadow-lg">Sim,
+                        Continuar</button></div>
             </div>
         </div>
     </div>
-    <div id="modal-inspecao" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-700">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+    <div id="modal-inspecao"
+        class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-700">
+            <div
+                class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                 <div>
                     <h3 class="text-2xl font-black dark:text-white" id="inspecao-titulo">Inspecionando</h3>
                     <div id="inspecao-stats" class="flex gap-4 mt-2"></div>
-                </div><button onclick="fecharModalInspecao()" class="text-slate-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+                </div><button onclick="fecharModalInspecao()" class="text-slate-400 hover:text-red-500 text-2xl"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 overflow-y-auto bg-slate-50 dark:bg-slate-900/50" id="conteudo-inspecao"></div>
         </div>
     </div>
-    <div id="modal-criar-usuario" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700">
+    <div id="modal-criar-usuario"
+        class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700">
             <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-black dark:text-white"><i class="fa-solid fa-user-plus text-brand mr-2"></i> Novo Usuário</h3><button onclick="fecharModalCriarUsuario()" class="text-slate-400 hover:text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-xl font-black dark:text-white"><i class="fa-solid fa-user-plus text-brand mr-2"></i>
+                    Novo Usuário</h3><button onclick="fecharModalCriarUsuario()"
+                    class="text-slate-400 hover:text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="form-criar-usuario" class="p-6 space-y-4">
-                <div><label class="block text-sm font-bold text-slate-500 mb-1">Nome</label><input type="text" id="novo-nome" required class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none"></div>
-                <div><label class="block text-sm font-bold text-slate-500 mb-1">E-mail</label><input type="email" id="novo-email" required class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none"></div>
-                <div><label class="block text-sm font-bold text-slate-500 mb-1">Senha</label><input type="password" id="novo-senha" required minlength="6" class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none"></div><button type="submit" class="w-full bg-brand text-slate-900 font-bold py-3 rounded-lg">Criar Acesso</button>
+                <div><label class="block text-sm font-bold text-slate-500 mb-1">Nome</label><input type="text"
+                        id="novo-nome" required
+                        class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none">
+                </div>
+                <div><label class="block text-sm font-bold text-slate-500 mb-1">E-mail</label><input type="email"
+                        id="novo-email" required
+                        class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none">
+                </div>
+                <div><label class="block text-sm font-bold text-slate-500 mb-1">Senha</label><input type="password"
+                        id="novo-senha" required minlength="6"
+                        class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none">
+                </div><button type="submit" class="w-full bg-brand text-slate-900 font-bold py-3 rounded-lg">Criar
+                    Acesso</button>
             </form>
         </div>
     </div>
-    <div id="modal-editar-usuario" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700">
+    <div id="modal-editar-usuario"
+        class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700">
             <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-black dark:text-white"><i class="fa-solid fa-user-pen text-blue-500 mr-2"></i> Editar Usuário</h3><button onclick="fecharModalEditarUsuario()" class="text-slate-400 hover:text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-xl font-black dark:text-white"><i class="fa-solid fa-user-pen text-blue-500 mr-2"></i>
+                    Editar Usuário</h3><button onclick="fecharModalEditarUsuario()"
+                    class="text-slate-400 hover:text-red-500 text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="form-editar-usuario" class="p-6 space-y-4"><input type="hidden" id="edit-id">
-                <div><label class="block text-sm font-bold text-slate-500 mb-1">Nome</label><input type="text" id="edit-nome" required class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none"></div>
-                <div><label class="block text-sm font-bold text-slate-500 mb-1">E-mail</label><input type="email" id="edit-email" required class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none"></div>
-                <div><label class="block text-sm font-bold text-slate-500 mb-1">Nova Senha</label><input type="password" id="edit-senha" minlength="6" class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none" placeholder="Deixe em branco para não alterar"></div><button type="submit" class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg">Salvar Alterações</button>
+                <div><label class="block text-sm font-bold text-slate-500 mb-1">Nome</label><input type="text"
+                        id="edit-nome" required
+                        class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none">
+                </div>
+                <div><label class="block text-sm font-bold text-slate-500 mb-1">E-mail</label><input type="email"
+                        id="edit-email" required
+                        class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none">
+                </div>
+                <div><label class="block text-sm font-bold text-slate-500 mb-1">Nova Senha</label><input type="password"
+                        id="edit-senha" minlength="6"
+                        class="w-full bg-slate-50 dark:bg-slate-900 border rounded-lg p-3 dark:text-white outline-none"
+                        placeholder="Deixe em branco para não alterar"></div><button type="submit"
+                    class="w-full bg-blue-500 text-white font-bold py-3 rounded-lg">Salvar Alterações</button>
             </form>
         </div>
     </div>
-    <div id="modal-tabela" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
-        <div class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-700">
+    <div id="modal-tabela"
+        class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+        <div
+            class="bg-white dark:bg-darkCard rounded-2xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-700">
             <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-2xl font-black dark:text-white" id="titulo-modal-tabela">Tabela</h3><button onclick="fecharModalTabela()" class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-2xl font-black dark:text-white" id="titulo-modal-tabela">Tabela</h3><button
+                    onclick="fecharModalTabela()"
+                    class="text-slate-400 hover:text-red-500 text-2xl transition-colors"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="overflow-y-auto bg-white dark:bg-darkCard relative flex-1">
                 <table class="w-full text-left text-sm border-collapse">
-                    <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold sticky top-0 shadow-sm" id="thead-tabela"></thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300" id="tbody-tabela"></tbody>
+                    <thead
+                        class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold sticky top-0 shadow-sm"
+                        id="thead-tabela"></thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300"
+                        id="tbody-tabela"></tbody>
                 </table>
             </div>
         </div>
     </div>
+    <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800/50 text-center">
+        <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+            Desenvolvido por <a href="https://github.com/GuilhermeRibeiroSilva" target="_blank"
+                class="font-bold text-slate-500 hover:text-brand dark:text-slate-400 dark:hover:text-brand transition-colors">Guilherme
+                Ribeiro</a>
+        </p>
+    </div>
     <script src="/static/js/admin.js"></script>
 </body>
+
 </html>
